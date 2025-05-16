@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -12,6 +11,7 @@ model User {
   id            String         @id @default(uuid())
   email         String         @unique
   subscriptions Subscription[]
+  createdAt     DateTime       @default(now()) @map("created_at")
 
   @@map("users")
 }
@@ -24,7 +24,9 @@ enum SubscriptionType {
 model Subscription {
   id          String           @id @default(uuid())
   type        SubscriptionType
-  isConfirmed Boolean
+  city        String
+  isConfirmed Boolean          @default(false)
+  createdAt   DateTime         @default(now()) @map("created_at")
 
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
