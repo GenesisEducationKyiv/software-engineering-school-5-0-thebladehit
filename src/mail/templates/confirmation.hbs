@@ -1,12 +1,60 @@
-<p>Your {{ frequency }} subscription for {{ city }} was created:)</p>
-<p>Please click below to confirm your subscription.</p>
-<p>
-    <a href="{{ urlConfirm }}">Confirm</a>
-</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Subscription Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 24px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 12px 0;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .unsubscribe {
+            display: inline-block;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Subscription Created ✅</h2>
+    <p>You have successfully created a <strong>{{ frequency }}</strong> weather subscription for <strong>{{ city }}</strong>.</p>
 
-<p>You can unsubscribe from this subscription in any time by clicking link below.</p>
-<p>
-    <a href="{{ urlUnsubscribe }}">Unsubscribe</a>
-</p>
+    <p>Please confirm your subscription by clicking the button below:</p>
+    <p>
+        <a class="btn" href="{{ urlConfirm }}">Confirm Subscription</a>
+    </p>
 
-<p>If you did not request this email you can safely ignore it.</p>
+    <p class="unsubscribe">
+        If you wish to unsubscribe at any time, click below:
+        <br />
+        <a href="{{ urlUnsubscribe }}">Unsubscribe</a>
+    </p>
+
+    <p style="margin-top: 24px; font-size: 13px; color: #777;">
+        If you did not request this email, you can safely ignore it.
+    </p>
+</div>
+</body>
+</html>
