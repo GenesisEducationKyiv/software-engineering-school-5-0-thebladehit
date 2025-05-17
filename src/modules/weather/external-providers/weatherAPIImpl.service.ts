@@ -7,6 +7,8 @@ import { WeatherAPIErrorDto } from '../dto/external/weatherAPI.error.dto';
 import { InvalidCityException } from '../errors/invalid-city.exception';
 import { WeatherDailyForecastDto } from '../dto/weather-daily-forecast.dto';
 import { DailyForecastAPIDto } from '../dto/external/daily-forecastAPI.dto';
+import { WeatherHourlyForecastDto } from '../dto/weather-hourly-forecast.dto';
+import { HourlyForecastAPIDto } from '../dto/external/hourly-forecastAPI.dto';
 
 // this service implementation use WeatherAPI.com
 @Injectable()
@@ -14,7 +16,10 @@ export class WeatherAPIImplService implements WeatherApiService {
   private readonly baseURL: string;
   private readonly apiKey: string;
   private readonly cacheTTL: number;
-  private cache = new Map<string, { data: WeatherCurrentDto; timestamp: number }>();
+  private cache = new Map<
+    string,
+    { data: WeatherCurrentDto; timestamp: number }
+  >();
 
   constructor(private readonly configService: ConfigService) {
     this.apiKey = this.configService.getOrThrow<string>('WEATHER_API_KEY');
@@ -58,6 +63,19 @@ export class WeatherAPIImplService implements WeatherApiService {
       sunrise: response.forecast.forecastday[0].astro.sunrise,
       sunset: response.forecast.forecastday[0].astro.sunset,
     };
+  }
+
+  async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
+    const now = new Date();
+    const url = `${this.baseURL}/forecast.json?key=${this.apiKey}&q=${encodeURIComponent(city)}&hour=${now.getHours()}`;
+    const response = await this.fetchWeatherDataFromAPI<HourlyForecastAPIDto>(url);
+    return {
+      temp: response.forecast.forecastday[0].hour[0].temp_c,
+      description: response.forecast.forecastday[0].hour[0].condition.text,
+      feelsLikeTemp: response.forecast.forecastday[0].hour[0].feelslike_c,
+      humidity: response.forecast.forecastday[0].hour[0].humidity,
+      chance_of_rain: response.forecast.forecastday[0].hour[0].chance_of_rain,
+    }
   }
 
   private async fetchWeatherDataFromAPI<T>(url: string): Promise<T> {

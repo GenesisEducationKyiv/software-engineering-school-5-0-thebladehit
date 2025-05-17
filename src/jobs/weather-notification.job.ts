@@ -4,6 +4,7 @@ import { SubscriptionsService } from '../modules/subscriptions/subscriptions.ser
 import { Cron } from '@nestjs/schedule';
 import { MailService } from '../modules/mail/contracts/mail.service';
 import { WeatherDailyForecastDto } from '../modules/weather/dto/weather-daily-forecast.dto';
+import { WeatherHourlyForecastDto } from '../modules/weather/dto/weather-hourly-forecast.dto';
 
 @Injectable()
 export class WeatherNotificationService {
@@ -41,8 +42,30 @@ export class WeatherNotificationService {
   }
 
   @Cron('5 * * * *')
-  notifyHourlySubscribers(): void {
-    // TODO do notification
+  async notifyHourlySubscribers(): Promise<void> {
+    const promises: Promise<void>[] = [];
+    const localCache = new Map<string, WeatherHourlyForecastDto>();
+
+    const subscriptions = await this.subscriptionService.getHourlySubscribers();
+    for (const subscription of subscriptions) {
+      const cached = localCache.get(subscription.city);
+      const forecast = cached
+        ? cached
+        : await this.weatherService.getHourlyForecast(subscription.city);
+      if (!forecast) {
+        await this.clearIncorrectSubscriptions(subscription.id);
+        continue;
+      }
+      localCache.set(subscription.city, forecast);
+      promises.push(
+        this.mailService.sendHourlyForecast({
+          email: subscription['user'].email,
+          city: subscription.city,
+          ...forecast,
+        })
+      );
+    }
+    await Promise.allSettled(promises);
   }
 
   private clearIncorrectSubscriptions(subscriptionId: string) {

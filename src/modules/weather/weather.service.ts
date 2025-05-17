@@ -3,6 +3,7 @@ import { WeatherApiService } from './external-contracts/weather-api.service';
 import { WeatherCurrentDto } from './dto/weather-current.dto';
 import { InvalidCityException } from './errors/invalid-city.exception';
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
+import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
 
 @Injectable()
 export class WeatherService {
@@ -22,6 +23,17 @@ export class WeatherService {
   async getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
     try {
       return await this.weatherApiService.getDailyForecast(city);
+    } catch (error) {
+      if (error instanceof InvalidCityException) {
+        return null
+      }
+      throw new Error(error.message);
+    }
+  }
+
+  async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
+    try {
+      return await this.weatherApiService.getHourlyForecast(city);
     } catch (error) {
       if (error instanceof InvalidCityException) {
         return null
