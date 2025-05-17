@@ -7,6 +7,7 @@ import {
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { SubscriptionRepository } from './contracts/subscription.repository';
 import { MailService } from '../mail/contracts/mail.service';
+import { Subscription, SubscriptionType } from '@prisma/client';
 
 @Injectable()
 export class SubscriptionsService {
@@ -14,6 +15,14 @@ export class SubscriptionsService {
     private readonly subscriptionRepository: SubscriptionRepository,
     private readonly mailService: MailService
   ) {}
+
+  getDailySubscribers(): Promise<Subscription[]> {
+    return this.subscriptionRepository.getSubscription(SubscriptionType.DAILY);
+  }
+
+  getHourlySubscribers(): Promise<Subscription[]> {
+    return this.subscriptionRepository.getSubscription(SubscriptionType.HOURLY);
+  }
 
   async createSubscription(dto: CreateSubscriptionDto) {
     const existingSubscription =
@@ -51,6 +60,10 @@ export class SubscriptionsService {
     if (!subscription) {
       throw new NotFoundException('Subscription with such id does not exist');
     }
-    await this.subscriptionRepository.deleteSubscription(token);
+    await this.deleteSubscription(token);
+  }
+
+  deleteSubscription(token: string) {
+    return this.subscriptionRepository.deleteSubscription(token)
   }
 }

@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { WeatherApiService } from './external-contracts/weather-api.service';
-import { WeatherDto } from './dto/weather.dto';
+import { WeatherCurrentDto } from './dto/weather-current.dto';
 import { InvalidCityException } from './errors/invalid-city.exception';
+import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 
 @Injectable()
 export class WeatherService {
   constructor(private readonly weatherApiService: WeatherApiService) {}
 
-  async getWeather(city: string): Promise<WeatherDto> {
+  async getWeather(city: string): Promise<WeatherCurrentDto> {
     try {
       return await this.weatherApiService.getWeather(city);
     } catch (error) {
@@ -15,6 +16,17 @@ export class WeatherService {
         throw new NotFoundException(`City: ${city} not found`);
       }
       throw new BadRequestException(error.message);
+    }
+  }
+
+  async getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
+    try {
+      return await this.weatherApiService.getDailyForecast(city);
+    } catch (error) {
+      if (error instanceof InvalidCityException) {
+        return null
+      }
+      throw new Error(error.message);
     }
   }
 }

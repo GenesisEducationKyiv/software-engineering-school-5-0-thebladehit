@@ -1,5 +1,5 @@
 import { SubscriptionRepository } from './contracts/subscription.repository';
-import { Subscription } from '@prisma/client';
+import { Subscription, SubscriptionType } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { Injectable } from '@nestjs/common';
@@ -7,6 +7,22 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   constructor(private readonly prismaService: PrismaService) {}
+
+  getSubscription(type: SubscriptionType): Promise<Subscription[]> {
+    return this.prismaService.subscription.findMany({
+      where: {
+        type,
+        isConfirmed: true,
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+      },
+    });
+  }
 
   findSubscriptionByToken(token: string): Promise<Subscription> {
     return this.prismaService.subscription.findUnique({

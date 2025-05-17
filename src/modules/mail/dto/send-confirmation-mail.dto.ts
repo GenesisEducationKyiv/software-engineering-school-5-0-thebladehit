@@ -1,6 +1,6 @@
 import { SubscriptionType } from '@prisma/client';
 
-export class SendMailDto {
+export class SendConfirmationMailDto {
   email: string;
   token: string;
   city: string;

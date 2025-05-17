@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from './contracts/mail.service';
-import { SendMailDto } from './dto/send-mail.dto';
+import { SendConfirmationMailDto } from './dto/send-confirmation-mail.dto';
+import { SendDailyForecastMailDto } from './dto/send-daily-forecast-mail.dto';
+import { SendHourlyForecastMailDto } from './dto/send-hourly-forecast-mail.dto';
 
 @Injectable()
 export class MailServiceImpl implements MailService {
@@ -16,7 +18,7 @@ export class MailServiceImpl implements MailService {
     token,
     city,
     frequency,
-  }: SendMailDto) {
+  }: SendConfirmationMailDto) {
     const urlConfirm = `${this.configService.get('BACK_BASE_URL')}/api/confirm/${token}`;
     const urlUnsubscribe = `${this.configService.get('BACK_BASE_URL')}/api/unsubscribe/${token}`;
 
@@ -30,6 +32,24 @@ export class MailServiceImpl implements MailService {
         urlConfirm,
         urlUnsubscribe,
       },
+    });
+  }
+
+  async sendDailyForecast(dto: SendDailyForecastMailDto): Promise<void> {
+    await this.mailerService.sendMail({
+      to: dto.email,
+      subject: `Daily Forecast for ${dto.city}`,
+      template: './daily-forecast',
+      context: dto
+    });
+  }
+
+  async sendHourlyForecast(dto: SendHourlyForecastMailDto): Promise<void> {
+    await this.mailerService.sendMail({
+      to: dto.email,
+      subject: `Hourly Forecast for ${dto.city}`,
+      template: './hourly-forecast',
+      context: dto
     });
   }
 }

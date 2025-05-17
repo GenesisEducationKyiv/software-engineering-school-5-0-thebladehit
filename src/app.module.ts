@@ -4,6 +4,8 @@ import { SubscriptionsModule } from './modules/subscriptions/subscriptions.modul
 import { MailModule } from './modules/mail/mail.module';
 import { WeatherModule } from './modules/weather/weather.module';
 import * as Joi from 'joi';
+import { ScheduleModule } from '@nestjs/schedule';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -20,9 +22,11 @@ import * as Joi from 'joi';
         WEATHER_BASE_URL: Joi.string().required(),
       }),
     }),
+    ScheduleModule.forRoot(),
     SubscriptionsModule,
     MailModule,
     WeatherModule,
+    JobsModule,
   ],
   controllers: [],
   providers: [],

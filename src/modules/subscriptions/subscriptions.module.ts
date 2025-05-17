@@ -17,5 +17,6 @@ import { MailModule } from '../mail/mail.module';
       useClass: SubscriptionRepositoryImpl,
     },
   ],
+  exports: [SubscriptionsService],
 })
 export class SubscriptionsModule {}
