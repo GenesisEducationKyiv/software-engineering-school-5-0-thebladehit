@@ -6,6 +6,8 @@ import { WeatherModule } from './modules/weather/weather.module';
 import * as Joi from 'joi';
 import { ScheduleModule } from '@nestjs/schedule';
 import { JobsModule } from './jobs/jobs.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -28,7 +30,7 @@ import { JobsModule } from './jobs/jobs.module';
     WeatherModule,
     JobsModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
