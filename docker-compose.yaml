@@ -1,6 +1,17 @@
 version: '3.9'
 
 services:
+  api:
+    image: weather-api-light:latest
+    restart: always
+    container_name: api
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:latest
     container_name: weather-api
@@ -12,7 +23,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
+    restart: always
 
 volumes:
   postgres_data:
