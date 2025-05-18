@@ -36,6 +36,7 @@ describe('WeatherAPIImplService', () => {
     service = module.get(WeatherApiService);
     configService = module.get(ConfigService);
     global.fetch = jest.fn();
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
