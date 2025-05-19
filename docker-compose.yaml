@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   api:
-    image: weather-api-light:latest
+    image: thebladehit/weather-api-light:latest
     restart: always
     container_name: api
     ports:
