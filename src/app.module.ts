@@ -8,6 +8,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { JobsModule } from './jobs/jobs.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { resolve } from 'path';
 
 @Module({
   imports: [
@@ -23,6 +25,10 @@ import { AppService } from './app.service';
         WEATHER_CACHE_TTL: Joi.number().integer().required(),
         WEATHER_BASE_URL: Joi.string().required(),
       }),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: resolve(__dirname, '..', 'client'),
+      serveRoot: '/',
     }),
     ScheduleModule.forRoot(),
     SubscriptionsModule,
