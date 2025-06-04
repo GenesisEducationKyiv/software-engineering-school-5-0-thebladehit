@@ -64,6 +64,6 @@ export class SubscriptionsService {
   }
 
   deleteSubscription(token: string) {
-    return this.subscriptionRepository.deleteSubscription(token)
+    return this.subscriptionRepository.deleteSubscription(token);
   }
 }

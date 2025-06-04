@@ -40,7 +40,7 @@ export class MailServiceImpl implements MailService {
       to: dto.email,
       subject: `Daily Forecast for ${dto.city}`,
       template: './daily-forecast',
-      context: dto
+      context: dto,
     });
   }
 
@@ -49,7 +49,7 @@ export class MailServiceImpl implements MailService {
       to: dto.email,
       subject: `Hourly Forecast for ${dto.city}`,
       template: './hourly-forecast',
-      context: dto
+      context: dto,
     });
   }
 }

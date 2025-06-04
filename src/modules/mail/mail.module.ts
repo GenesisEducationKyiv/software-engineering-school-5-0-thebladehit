@@ -18,7 +18,7 @@ import { MailService } from './contracts/mail.service';
           auth: {
             user: configService.get<string>('SMTP_USERNAME'),
             pass: configService.get<string>('SMTP_PASSWORD'),
-          }
+          },
         },
         defaults: {
           from: '"No Reply" <noreply@example.com>',
@@ -33,10 +33,12 @@ import { MailService } from './contracts/mail.service';
       }),
     }),
   ],
-  providers: [{
-    provide: MailService,
-    useClass: MailServiceImpl,
-  }],
+  providers: [
+    {
+      provide: MailService,
+      useClass: MailServiceImpl,
+    },
+  ],
   exports: [MailService],
 })
 export class MailModule {}
