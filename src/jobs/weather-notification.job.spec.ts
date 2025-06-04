@@ -63,9 +63,15 @@ describe('WeatherNotificationService', () => {
         sunset: '8:00 PM',
       };
 
-      jest.spyOn(subscriptionsService, 'getDailySubscribers').mockResolvedValue(subscribers as any);
-      jest.spyOn(weatherService, 'getDailyForecast').mockResolvedValue(forecast as any);
-      const sendSpy = jest.spyOn(mailService, 'sendDailyForecast').mockResolvedValue();
+      jest
+        .spyOn(subscriptionsService, 'getDailySubscribers')
+        .mockResolvedValue(subscribers as any);
+      jest
+        .spyOn(weatherService, 'getDailyForecast')
+        .mockResolvedValue(forecast as any);
+      const sendSpy = jest
+        .spyOn(mailService, 'sendDailyForecast')
+        .mockResolvedValue();
 
       await service.notifyDailySubscribers();
 
@@ -78,9 +84,13 @@ describe('WeatherNotificationService', () => {
         { id: '1', city: 'Nowhere', user: { email: 'x@x.com' } },
       ];
 
-      jest.spyOn(subscriptionsService, 'getDailySubscribers').mockResolvedValue(subscribers as any);
+      jest
+        .spyOn(subscriptionsService, 'getDailySubscribers')
+        .mockResolvedValue(subscribers as any);
       jest.spyOn(weatherService, 'getDailyForecast').mockResolvedValue(null);
-      const deleteSpy = jest.spyOn(subscriptionsService, 'deleteSubscription').mockResolvedValue({} as Subscription);
+      const deleteSpy = jest
+        .spyOn(subscriptionsService, 'deleteSubscription')
+        .mockResolvedValue({} as Subscription);
 
       await service.notifyDailySubscribers();
 
@@ -101,9 +111,15 @@ describe('WeatherNotificationService', () => {
         chance_of_rain: 40,
       };
 
-      jest.spyOn(subscriptionsService, 'getHourlySubscribers').mockResolvedValue(subscribers as any);
-      jest.spyOn(weatherService, 'getHourlyForecast').mockResolvedValue(forecast as any);
-      const sendSpy = jest.spyOn(mailService, 'sendHourlyForecast').mockResolvedValue();
+      jest
+        .spyOn(subscriptionsService, 'getHourlySubscribers')
+        .mockResolvedValue(subscribers as any);
+      jest
+        .spyOn(weatherService, 'getHourlyForecast')
+        .mockResolvedValue(forecast as any);
+      const sendSpy = jest
+        .spyOn(mailService, 'sendHourlyForecast')
+        .mockResolvedValue();
 
       await service.notifyHourlySubscribers();
 

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 

@@ -68,14 +68,15 @@ export class WeatherAPIImplService implements WeatherApiService {
   async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
     const now = new Date();
     const url = `${this.baseURL}/forecast.json?key=${this.apiKey}&q=${encodeURIComponent(city)}&hour=${now.getHours()}`;
-    const response = await this.fetchWeatherDataFromAPI<HourlyForecastAPIDto>(url);
+    const response =
+      await this.fetchWeatherDataFromAPI<HourlyForecastAPIDto>(url);
     return {
       temp: response.forecast.forecastday[0].hour[0].temp_c,
       description: response.forecast.forecastday[0].hour[0].condition.text,
       feelsLikeTemp: response.forecast.forecastday[0].hour[0].feelslike_c,
       humidity: response.forecast.forecastday[0].hour[0].humidity,
       chance_of_rain: response.forecast.forecastday[0].hour[0].chance_of_rain,
-    }
+    };
   }
 
   private async fetchWeatherDataFromAPI<T>(url: string): Promise<T> {
