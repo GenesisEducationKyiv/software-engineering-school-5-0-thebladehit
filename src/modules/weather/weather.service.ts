@@ -3,11 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { WeatherApiService } from './external-contracts/weather-api.service';
+
 import { WeatherCurrentDto } from './dto/weather-current.dto';
-import { InvalidCityException } from './errors/invalid-city.exception';
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
+import { InvalidCityException } from './errors/invalid-city.exception';
+import { WeatherApiService } from './external-contracts/weather-api.service';
 
 @Injectable()
 export class WeatherService {

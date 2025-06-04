@@ -1,12 +1,13 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
+import { SubscriptionType } from '@prisma/client';
+
+import { MailService } from './contracts/mail.service';
 import { SendConfirmationMailDto } from './dto/send-confirmation-mail.dto';
 import { SendDailyForecastMailDto } from './dto/send-daily-forecast-mail.dto';
 import { SendHourlyForecastMailDto } from './dto/send-hourly-forecast-mail.dto';
-import { MailService } from './contracts/mail.service';
 import { MailServiceImpl } from './mail.serviceImpl';
-import { SubscriptionType } from '@prisma/client';
 
 const fakeAPIUrl = 'http://fake-api.com';
 

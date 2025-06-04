@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WeatherService } from '../modules/weather/weather.service';
-import { SubscriptionsService } from '../modules/subscriptions/subscriptions.service';
-import { MailService } from '../modules/mail/contracts/mail.service';
-import { WeatherNotificationService } from './weather-notification.job';
 import { Subscription } from '@prisma/client';
+
+import { MailService } from '../modules/mail/contracts/mail.service';
+import { SubscriptionsService } from '../modules/subscriptions/subscriptions.service';
+import { WeatherService } from '../modules/weather/weather.service';
+
+import { WeatherNotificationService } from './weather-notification.job';
 
 describe('WeatherNotificationService', () => {
   let service: WeatherNotificationService;
@@ -65,10 +67,10 @@ describe('WeatherNotificationService', () => {
 
       jest
         .spyOn(subscriptionsService, 'getDailySubscribers')
-        .mockResolvedValue(subscribers as any);
+        .mockResolvedValue(subscribers as unknown as Subscription[]);
       jest
         .spyOn(weatherService, 'getDailyForecast')
-        .mockResolvedValue(forecast as any);
+        .mockResolvedValue(forecast);
       const sendSpy = jest
         .spyOn(mailService, 'sendDailyForecast')
         .mockResolvedValue();
@@ -86,7 +88,7 @@ describe('WeatherNotificationService', () => {
 
       jest
         .spyOn(subscriptionsService, 'getDailySubscribers')
-        .mockResolvedValue(subscribers as any);
+        .mockResolvedValue(subscribers as unknown as Subscription[]);
       jest.spyOn(weatherService, 'getDailyForecast').mockResolvedValue(null);
       const deleteSpy = jest
         .spyOn(subscriptionsService, 'deleteSubscription')
@@ -113,10 +115,10 @@ describe('WeatherNotificationService', () => {
 
       jest
         .spyOn(subscriptionsService, 'getHourlySubscribers')
-        .mockResolvedValue(subscribers as any);
+        .mockResolvedValue(subscribers as unknown as Subscription[]);
       jest
         .spyOn(weatherService, 'getHourlyForecast')
-        .mockResolvedValue(forecast as any);
+        .mockResolvedValue(forecast);
       const sendSpy = jest
         .spyOn(mailService, 'sendHourlyForecast')
         .mockResolvedValue();

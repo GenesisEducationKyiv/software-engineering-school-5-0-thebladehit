@@ -1,8 +1,10 @@
-import { SubscriptionRepository } from './contracts/subscription.repository';
-import { Subscription, SubscriptionType } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { Injectable } from '@nestjs/common';
+import { Subscription, SubscriptionType } from '@prisma/client';
+
+import { PrismaService } from '../../prisma/prisma.service';
+
+import { SubscriptionRepository } from './contracts/subscription.repository';
+import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 
 @Injectable()
 export class SubscriptionRepositoryImpl implements SubscriptionRepository {

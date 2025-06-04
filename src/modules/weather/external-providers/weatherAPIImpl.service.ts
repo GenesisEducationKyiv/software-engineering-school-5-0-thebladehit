@@ -1,14 +1,15 @@
-import { WeatherApiService } from '../external-contracts/weather-api.service';
-import { WeatherCurrentDto } from '../dto/weather-current.dto';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
+import { DailyForecastAPIDto } from '../dto/external/daily-forecastAPI.dto';
+import { HourlyForecastAPIDto } from '../dto/external/hourly-forecastAPI.dto';
 import { WeatherAPIDto } from '../dto/external/weatherAPI.dto';
 import { WeatherAPIErrorDto } from '../dto/external/weatherAPI.error.dto';
-import { InvalidCityException } from '../errors/invalid-city.exception';
+import { WeatherCurrentDto } from '../dto/weather-current.dto';
 import { WeatherDailyForecastDto } from '../dto/weather-daily-forecast.dto';
-import { DailyForecastAPIDto } from '../dto/external/daily-forecastAPI.dto';
 import { WeatherHourlyForecastDto } from '../dto/weather-hourly-forecast.dto';
-import { HourlyForecastAPIDto } from '../dto/external/hourly-forecastAPI.dto';
+import { InvalidCityException } from '../errors/invalid-city.exception';
+import { WeatherApiService } from '../external-contracts/weather-api.service';
 
 // this service implementation use WeatherAPI.com
 @Injectable()

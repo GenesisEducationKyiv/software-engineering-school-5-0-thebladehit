@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { MailerService } from '@nestjs-modules/mailer';
+
 import { MailService } from './contracts/mail.service';
 import { SendConfirmationMailDto } from './dto/send-confirmation-mail.dto';
 import { SendDailyForecastMailDto } from './dto/send-daily-forecast-mail.dto';
@@ -18,7 +19,7 @@ export class MailServiceImpl implements MailService {
     token,
     city,
     frequency,
-  }: SendConfirmationMailDto) {
+  }: SendConfirmationMailDto): Promise<void> {
     const urlConfirm = `${this.configService.get('BACK_BASE_URL')}/api/confirm/${token}`;
     const urlUnsubscribe = `${this.configService.get('BACK_BASE_URL')}/api/unsubscribe/${token}`;
 

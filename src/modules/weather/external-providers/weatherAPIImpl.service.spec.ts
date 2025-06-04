@@ -1,8 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { WeatherApiService } from '../external-contracts/weather-api.service';
-import { WeatherAPIImplService } from './weatherAPIImpl.service';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { InvalidCityException } from '../errors/invalid-city.exception';
+import { WeatherApiService } from '../external-contracts/weather-api.service';
+
+import { WeatherAPIImplService } from './weatherAPIImpl.service';
 
 const fakeAPIUrl = 'http://fake-api.com';
 

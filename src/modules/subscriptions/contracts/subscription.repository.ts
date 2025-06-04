@@ -1,4 +1,5 @@
 import { Subscription, SubscriptionType } from '@prisma/client';
+
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto';
 
 export abstract class SubscriptionRepository {
