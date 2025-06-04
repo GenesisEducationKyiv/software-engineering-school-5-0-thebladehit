@@ -4,10 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateSubscriptionDto } from './dto/create-subscription.dto';
-import { SubscriptionRepository } from './contracts/subscription.repository';
-import { MailService } from '../mail/contracts/mail.service';
 import { Subscription, SubscriptionType } from '@prisma/client';
+
+import { MailService } from '../mail/contracts/mail.service';
+
+import { SubscriptionRepository } from './contracts/subscription.repository';
+import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 
 @Injectable()
 export class SubscriptionsService {
@@ -24,7 +26,7 @@ export class SubscriptionsService {
     return this.subscriptionRepository.getSubscription(SubscriptionType.HOURLY);
   }
 
-  async createSubscription(dto: CreateSubscriptionDto) {
+  async createSubscription(dto: CreateSubscriptionDto): Promise<void> {
     const existingSubscription =
       await this.subscriptionRepository.findDuplicateSubscription(dto);
     if (existingSubscription) {
@@ -40,7 +42,7 @@ export class SubscriptionsService {
     });
   }
 
-  async confirmSubscription(token: string) {
+  async confirmSubscription(token: string): Promise<void> {
     const subscription =
       await this.subscriptionRepository.findSubscriptionByToken(token);
     if (!subscription) {
@@ -54,7 +56,7 @@ export class SubscriptionsService {
     await this.subscriptionRepository.confirmSubscription(token);
   }
 
-  async unsubscribeSubscription(token: string) {
+  async unsubscribeSubscription(token: string): Promise<void> {
     const subscription =
       await this.subscriptionRepository.findSubscriptionByToken(token);
     if (!subscription) {
@@ -63,7 +65,7 @@ export class SubscriptionsService {
     await this.deleteSubscription(token);
   }
 
-  deleteSubscription(token: string) {
+  deleteSubscription(token: string): Promise<Subscription> {
     return this.subscriptionRepository.deleteSubscription(token);
   }
 }

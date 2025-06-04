@@ -1,5 +1,5 @@
-import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
 import { SubscriptionType } from '@prisma/client';
+import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
 
 export class CreateSubscriptionDto {
   @IsEmail()
