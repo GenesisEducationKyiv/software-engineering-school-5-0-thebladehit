@@ -36,8 +36,6 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
 
-    'security/detect-object-injection': 'off',
-
     'semi': ['error', 'always'],
     'quotes': ['error', 'single'],
     'no-multiple-empty-lines': ['error', { max: 1 }],
