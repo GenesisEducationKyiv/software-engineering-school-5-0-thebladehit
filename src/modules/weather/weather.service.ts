@@ -1,9 +1,14 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { WeatherApiService } from './external-contracts/weather-api.service';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
 import { WeatherCurrentDto } from './dto/weather-current.dto';
-import { InvalidCityException } from './errors/invalid-city.exception';
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
+import { InvalidCityException } from './errors/invalid-city.exception';
+import { WeatherApiService } from './external-contracts/weather-api.service';
 
 @Injectable()
 export class WeatherService {
@@ -16,7 +21,7 @@ export class WeatherService {
       if (error instanceof InvalidCityException) {
         throw new NotFoundException(`City: ${city} not found`);
       }
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error['message']);
     }
   }
 
@@ -25,9 +30,9 @@ export class WeatherService {
       return await this.weatherApiService.getDailyForecast(city);
     } catch (error) {
       if (error instanceof InvalidCityException) {
-        return null
+        return null;
       }
-      throw new Error(error.message);
+      throw new Error(error['message']);
     }
   }
 
@@ -36,9 +41,9 @@ export class WeatherService {
       return await this.weatherApiService.getHourlyForecast(city);
     } catch (error) {
       if (error instanceof InvalidCityException) {
-        return null
+        return null;
       }
-      throw new Error(error.message);
+      throw new Error(error['message']);
     }
   }
 }

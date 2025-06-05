@@ -1,6 +1,14 @@
-import {Controller, Get, Query, UsePipes, ValidationPipe} from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+
+import { CityQueryDto } from './dto/city-query.dto';
+import { WeatherCurrentDto } from './dto/weather-current.dto';
 import { WeatherService } from './weather.service';
-import {CityQueryDto} from "./dto/city-query.dto";
 
 @Controller('weather')
 export class WeatherController {
@@ -8,7 +16,7 @@ export class WeatherController {
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
-  getWeather(@Query() query: CityQueryDto) {
+  getWeather(@Query() query: CityQueryDto): Promise<WeatherCurrentDto> {
     return this.weatherService.getWeather(query.city);
   }
 }

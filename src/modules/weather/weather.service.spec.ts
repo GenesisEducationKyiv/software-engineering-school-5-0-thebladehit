@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { WeatherService } from './weather.service';
-import { WeatherApiService } from './external-contracts/weather-api.service';
-import { InvalidCityException } from './errors/invalid-city.exception';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { WeatherCurrentDto } from './dto/weather-current.dto';
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
+import { InvalidCityException } from './errors/invalid-city.exception';
+import { WeatherApiService } from './external-contracts/weather-api.service';
+import { WeatherService } from './weather.service';
 
 describe('WeatherService', () => {
   let service: WeatherService;

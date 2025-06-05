@@ -11,5 +11,5 @@ export class HourlyForecastAPIDto {
         chance_of_rain: number;
       }[];
     }[];
-  }
+  };
 }

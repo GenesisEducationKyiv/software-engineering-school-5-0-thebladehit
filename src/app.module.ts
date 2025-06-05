@@ -1,15 +1,17 @@
+import { resolve } from 'path';
+
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
-import { MailModule } from './modules/mail/mail.module';
-import { WeatherModule } from './modules/weather/weather.module';
-import * as Joi from 'joi';
 import { ScheduleModule } from '@nestjs/schedule';
-import { JobsModule } from './jobs/jobs.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as Joi from 'joi';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { resolve } from 'path';
+import { JobsModule } from './jobs/jobs.module';
+import { MailModule } from './modules/mail/mail.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { WeatherModule } from './modules/weather/weather.module';
 
 @Module({
   imports: [

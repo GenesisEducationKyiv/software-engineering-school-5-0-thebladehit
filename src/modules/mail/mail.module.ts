@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
-import { MailServiceImpl } from './mail.serviceImpl';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
+
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+
 import { MailService } from './contracts/mail.service';
+import { MailServiceImpl } from './mail.serviceImpl';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { MailService } from './contracts/mail.service';
           auth: {
             user: configService.get<string>('SMTP_USERNAME'),
             pass: configService.get<string>('SMTP_PASSWORD'),
-          }
+          },
         },
         defaults: {
           from: '"No Reply" <noreply@example.com>',
@@ -33,10 +35,12 @@ import { MailService } from './contracts/mail.service';
       }),
     }),
   ],
-  providers: [{
-    provide: MailService,
-    useClass: MailServiceImpl,
-  }],
+  providers: [
+    {
+      provide: MailService,
+      useClass: MailServiceImpl,
+    },
+  ],
   exports: [MailService],
 })
 export class MailModule {}

@@ -1,14 +1,15 @@
-import { WeatherApiService } from '../external-contracts/weather-api.service';
-import { WeatherCurrentDto } from '../dto/weather-current.dto';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
+import { DailyForecastAPIDto } from '../dto/external/daily-forecastAPI.dto';
+import { HourlyForecastAPIDto } from '../dto/external/hourly-forecastAPI.dto';
 import { WeatherAPIDto } from '../dto/external/weatherAPI.dto';
 import { WeatherAPIErrorDto } from '../dto/external/weatherAPI.error.dto';
-import { InvalidCityException } from '../errors/invalid-city.exception';
+import { WeatherCurrentDto } from '../dto/weather-current.dto';
 import { WeatherDailyForecastDto } from '../dto/weather-daily-forecast.dto';
-import { DailyForecastAPIDto } from '../dto/external/daily-forecastAPI.dto';
 import { WeatherHourlyForecastDto } from '../dto/weather-hourly-forecast.dto';
-import { HourlyForecastAPIDto } from '../dto/external/hourly-forecastAPI.dto';
+import { InvalidCityException } from '../errors/invalid-city.exception';
+import { WeatherApiService } from '../external-contracts/weather-api.service';
 
 // this service implementation use WeatherAPI.com
 @Injectable()
@@ -68,14 +69,15 @@ export class WeatherAPIImplService implements WeatherApiService {
   async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
     const now = new Date();
     const url = `${this.baseURL}/forecast.json?key=${this.apiKey}&q=${encodeURIComponent(city)}&hour=${now.getHours()}`;
-    const response = await this.fetchWeatherDataFromAPI<HourlyForecastAPIDto>(url);
+    const response =
+      await this.fetchWeatherDataFromAPI<HourlyForecastAPIDto>(url);
     return {
       temp: response.forecast.forecastday[0].hour[0].temp_c,
       description: response.forecast.forecastday[0].hour[0].condition.text,
       feelsLikeTemp: response.forecast.forecastday[0].hour[0].feelslike_c,
       humidity: response.forecast.forecastday[0].hour[0].humidity,
       chance_of_rain: response.forecast.forecastday[0].hour[0].chance_of_rain,
-    }
+    };
   }
 
   private async fetchWeatherDataFromAPI<T>(url: string): Promise<T> {

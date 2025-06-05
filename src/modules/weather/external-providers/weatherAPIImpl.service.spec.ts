@@ -1,15 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { WeatherApiService } from '../external-contracts/weather-api.service';
-import { WeatherAPIImplService } from './weatherAPIImpl.service';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { InvalidCityException } from '../errors/invalid-city.exception';
+import { WeatherApiService } from '../external-contracts/weather-api.service';
+
+import { WeatherAPIImplService } from './weatherAPIImpl.service';
 
 const fakeAPIUrl = 'http://fake-api.com';
 
 describe('WeatherAPIImplService', () => {
   let service: WeatherApiService;
-  let configService: ConfigService;
-
   const mockConfigService = {
     getOrThrow: jest.fn().mockReturnValue('test-api-key'),
     get: jest.fn((key: string) => {
@@ -34,7 +34,6 @@ describe('WeatherAPIImplService', () => {
     }).compile();
 
     service = module.get(WeatherApiService);
-    configService = module.get(ConfigService);
     global.fetch = jest.fn();
     jest.clearAllMocks();
   });

@@ -1,4 +1,4 @@
-import { IsString, Length, Matches } from 'class-validator';
+import { IsString, Length } from 'class-validator';
 
 export class CityQueryDto {
   @IsString()

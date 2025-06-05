@@ -1,13 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SubscriptionsService } from './subscriptions.service';
-import { SubscriptionRepository } from './contracts/subscription.repository';
-import { MailService } from '../mail/contracts/mail.service';
-import { Subscription, SubscriptionType } from '@prisma/client';
 import {
   BadRequestException,
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Subscription, SubscriptionType } from '@prisma/client';
+
+import { MailService } from '../mail/contracts/mail.service';
+
+import { SubscriptionRepository } from './contracts/subscription.repository';
+import { SubscriptionsService } from './subscriptions.service';
 
 describe('SubscriptionsService', () => {
   let service: SubscriptionsService;
@@ -57,7 +59,7 @@ describe('SubscriptionsService', () => {
     it('should throw ConflictException if subscription already exists', async () => {
       repository.findDuplicateSubscription.mockResolvedValue({
         id: '123',
-      } as any);
+      } as Subscription);
 
       await expect(service.createSubscription(dto)).rejects.toThrow(
         ConflictException
@@ -68,7 +70,7 @@ describe('SubscriptionsService', () => {
       repository.findDuplicateSubscription.mockResolvedValue(null);
       repository.createSubscription.mockResolvedValue({
         id: 'token123',
-      } as any);
+      } as Subscription);
 
       await service.createSubscription(dto);
 
