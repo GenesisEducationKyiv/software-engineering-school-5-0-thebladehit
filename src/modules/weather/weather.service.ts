@@ -32,7 +32,7 @@ export class WeatherService {
       if (error instanceof InvalidCityException) {
         return null;
       }
-      throw new Error(error['message']);
+      throw error;
     }
   }
 
@@ -43,7 +43,7 @@ export class WeatherService {
       if (error instanceof InvalidCityException) {
         return null;
       }
-      throw new Error(error['message']);
+      throw error;
     }
   }
 }
