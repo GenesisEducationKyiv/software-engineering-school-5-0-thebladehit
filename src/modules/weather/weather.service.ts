@@ -21,7 +21,7 @@ export class WeatherService {
       if (error instanceof InvalidCityException) {
         throw new NotFoundException(`City: ${city} not found`);
       }
-      throw new BadRequestException(error['message']);
+      throw new BadRequestException(error);
     }
   }
 
