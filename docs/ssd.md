@@ -50,8 +50,14 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 - Caches weather data for time interval
 
 #### Includes:
+- WeatherController
 - WeatherService
 - ExternalWeatherAPIService
+
+#### Communications
+- `WeatherService` - is used by `WeatherController` for getting current weather.
+- `WeatherService` - is used by `WeatherNotificationService` for getting weather forecast. 
+- `ExternalWeatherAPIService` is used by `WeatherService` for getting weather data from external API.
 
 #### Using:
 - External WeatherAPI.com API
@@ -68,6 +74,16 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 - Generates subscription token
 - Provides subscriptions information
 
+#### Includes
+- Subscription Service
+- Subscription Controller
+- Subscription Repository
+
+#### Communications
+- `SubscriptionService` is used by `SubscriptionController` for: create, confirm, unsubscribe subscription.
+- `SubscriptionService` is used by `WeatherNotificationService` for getting subscribers.
+- `SubscriptionRepository` is used by `SubscriptionService` for db access.
+
 #### Endpoints:
 - `POST /subscribe`
 - `GET /confirm/:token`
@@ -77,6 +93,12 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 #### Responsibilities:
 - Sends subscription confirmation emails
 - Sends forecast emails
+
+#### Includes
+- MailService
+
+#### Communications
+- `MailService` is used by `SubscriptionService` and `WeatherNotificationService` for sending emails.
 
 #### Using:
 - Nest Mailer Module
@@ -89,6 +111,9 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 ### 4.4 Jobs Module
 #### Responsibilities:
 - Sends `DAILY/HOURLY` forecast for users
+
+#### Includes
+- WeatherNotificationService
 
 #### Using:
 - @nestjs/schedule for cron job
@@ -107,7 +132,66 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 - `email`: TEXT
 - `createdAt`: TIMESTAMP
 
-## 6. Tech Stack
+## 6. API Contracts
+### 6.1 GET /weather?city=
+**Description**: Get current weather for city
+#### Query Params
+- `city`: string
+
+#### Responses
+**200 OK**
+```text
+{
+  "temperature": number,
+  "humidity": number,
+  "description": string
+}
+```
+
+**400 Bad request**
+**404 Not Found**
+
+### 6.2 POST /subscribe
+**Description**: Create subscription for weather forecast
+
+#### Request
+```text
+POST /subscribe
+Content-Type: application/json
+
+{
+  "email": string,
+  "city": string,
+  "frequency": HOURLY | DAILY
+}
+```
+
+#### Responses
+**200 OK**  
+**400 Bad Invalid Input**   
+**409 Conflict**
+
+### 6.3 GET /confirm/:token
+**Description**: Confirm subscription creation
+#### Path Parameters
+- `token`: string
+
+#### Responses
+**200 OK**  
+**400 Bad Request**     
+**404 Not Found**
+
+### 6.4 GET /unsubscribe/:token
+**Description**: Cancel subscription
+#### Path Parameters
+- `token`: string
+
+#### Responses
+**200 OK**  
+**400 Bad Request**     
+**404 Not Found**
+
+## 7. Tech Stack
 - Nest JS (express)
 - PostgreSQL / PrismaORM
 - NodeMailer
