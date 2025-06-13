@@ -8,10 +8,10 @@ import * as Joi from 'joi';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { JobsModule } from './jobs/jobs.module';
-import { MailModule } from './modules/mail/mail.module';
-import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
-import { WeatherModule } from './modules/weather/weather.module';
+import { JobsModule } from '../jobs/jobs.module';
+import { MailModule } from './mail/mail.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { WeatherModule } from './weather/weather.module';
 
 @Module({
   imports: [
