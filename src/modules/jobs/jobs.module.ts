@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { MailModule } from '../modules/mail/mail.module';
-import { SubscriptionsModule } from '../modules/subscriptions/subscriptions.module';
-import { WeatherModule } from '../modules/weather/weather.module';
+import { MailModule } from '../mail/mail.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
+import { WeatherModule } from '../weather/weather.module';
 
 import { WeatherNotificationService } from './weather-notification.job';
 

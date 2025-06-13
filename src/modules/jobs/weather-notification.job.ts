@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { Subscription } from '@prisma/client';
 
-import { MailService } from '../modules/mail/contracts/mail.service';
-import { SubscriptionsService } from '../modules/subscriptions/subscriptions.service';
-import { WeatherDailyForecastDto } from '../modules/weather/dto/weather-daily-forecast.dto';
-import { WeatherHourlyForecastDto } from '../modules/weather/dto/weather-hourly-forecast.dto';
-import { WeatherService } from '../modules/weather/weather.service';
+import { MailService } from '../mail/contracts/mail.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import { WeatherDailyForecastDto } from '../weather/dto/weather-daily-forecast.dto';
+import { WeatherHourlyForecastDto } from '../weather/dto/weather-hourly-forecast.dto';
+import { WeatherService } from '../weather/weather.service';
 
 @Injectable()
 export class WeatherNotificationService {

@@ -185,7 +185,7 @@ npm run test
 ```
 
 Include unit tests for key services:
-- [WeatherNotificationService](./src/jobs/weather-notification.job.spec.ts)
+- [WeatherNotificationService](src/modules/jobs/weather-notification.job.spec.ts)
 - [MailServiceImpl](./src/modules/mail/mail.service.spec.ts)
 - [SubscriptionsService](./src/modules/subscriptions/subscriptions.service.spec.ts)
 - [WeatherService](./src/modules/weather/weather.service.spec.ts)
