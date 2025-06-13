@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Subscription } from '@prisma/client';
 
-import { MailService } from '../modules/mail/contracts/mail.service';
-import { SubscriptionsService } from '../modules/subscriptions/subscriptions.service';
-import { WeatherService } from '../modules/weather/weather.service';
+import { MailService } from '../mail/contracts/mail.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import { WeatherService } from '../weather/weather.service';
 
 import { WeatherNotificationService } from './weather-notification.job';
 
