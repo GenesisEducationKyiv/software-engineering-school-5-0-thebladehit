@@ -29,7 +29,7 @@ import { WeatherModule } from './weather/weather.module';
       }),
     }),
     ServeStaticModule.forRoot({
-      rootPath: resolve(__dirname, 'client'),
+      rootPath: resolve(__dirname, '..', 'client'),
       serveRoot: '/',
     }),
     ScheduleModule.forRoot(),
