@@ -3,11 +3,11 @@ import { Subscription, SubscriptionType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
-import { SubscriptionRepository } from './contracts/subscription.repository';
+import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 
 @Injectable()
-export class SubscriptionRepositoryImpl implements SubscriptionRepository {
+export class SubscriptionRepository implements AbstractSubscriptionRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   getSubscriptions(type: SubscriptionType): Promise<Subscription[]> {
