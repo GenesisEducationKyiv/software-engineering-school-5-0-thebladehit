@@ -1,4 +1,4 @@
-export class WeatherAPIDto {
+export interface WeatherAPIDto {
   current: {
     temp_c: number;
     condition: {
