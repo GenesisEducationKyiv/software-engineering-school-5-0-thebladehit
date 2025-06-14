@@ -3,7 +3,7 @@ import { Subscription, SubscriptionType } from '@prisma/client';
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto';
 
 export abstract class SubscriptionRepository {
-  abstract getSubscription(type: SubscriptionType): Promise<Subscription[]>;
+  abstract getSubscriptions(type: SubscriptionType): Promise<Subscription[]>;
   abstract findSubscriptionByToken(token: string): Promise<Subscription>;
   abstract findDuplicateSubscription(
     dto: CreateSubscriptionDto

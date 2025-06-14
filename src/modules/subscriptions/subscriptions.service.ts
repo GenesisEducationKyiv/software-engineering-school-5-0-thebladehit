@@ -19,11 +19,11 @@ export class SubscriptionsService {
   ) {}
 
   getDailySubscribers(): Promise<Subscription[]> {
-    return this.subscriptionRepository.getSubscription(SubscriptionType.DAILY);
+    return this.subscriptionRepository.getSubscriptions(SubscriptionType.DAILY);
   }
 
   getHourlySubscribers(): Promise<Subscription[]> {
-    return this.subscriptionRepository.getSubscription(SubscriptionType.HOURLY);
+    return this.subscriptionRepository.getSubscriptions(SubscriptionType.HOURLY);
   }
 
   async createSubscription(dto: CreateSubscriptionDto): Promise<void> {
