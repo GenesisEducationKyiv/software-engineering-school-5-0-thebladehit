@@ -1,4 +1,4 @@
-export class WeatherDailyForecastDto {
+export interface WeatherDailyForecastDto {
   maxTemp: number;
   minTemp: number;
   avgTemp: number;
