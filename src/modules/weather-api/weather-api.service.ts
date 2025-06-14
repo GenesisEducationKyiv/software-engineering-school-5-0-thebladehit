@@ -4,13 +4,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
-import { WeatherCurrentDto } from '../weather/dto/weather-current.dto';
-import { WeatherAPIDto } from './dto/weatherAPI.dto';
 import { WeatherDailyForecastDto } from '../weather/dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from '../weather/dto/weather-hourly-forecast.dto';
-import { WeatherAPIErrorDto } from './dto/weatherAPI.error.dto';
+import { WeatherResponseDto } from '../weather/dto/weather.dto';
+
 import { ForecastResponseDto } from './dto/forecast-api.dto';
+import { WeatherAPIDto } from './dto/weatherAPI.dto';
+import { WeatherAPIErrorDto } from './dto/weatherAPI.error.dto';
 
 // this service implementation use WeatherAPI.com
 @Injectable()
@@ -23,7 +25,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
     this.baseURL = this.configService.get<string>('WEATHER_BASE_URL');
   }
 
-  async getWeather(city: string): Promise<WeatherCurrentDto> {
+  async getWeather(city: string): Promise<WeatherResponseDto> {
     const url = `${this.baseURL}/current.json?key=${this.apiKey}&q=${encodeURIComponent(city)}`;
     const response = await this.fetchWeatherDataFromAPI<WeatherAPIDto>(url);
     return {

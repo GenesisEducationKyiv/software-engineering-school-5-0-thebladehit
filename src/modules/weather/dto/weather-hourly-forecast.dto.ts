@@ -1,4 +1,4 @@
-export class WeatherHourlyForecastDto {
+export interface WeatherHourlyForecastDto {
   temp: number;
   description: string;
   feelsLikeTemp: number;
