@@ -2,7 +2,7 @@ import { SendConfirmationMailDto } from '../dto/send-confirmation-mail.dto';
 import { SendDailyForecastMailDto } from '../dto/send-daily-forecast-mail.dto';
 import { SendHourlyForecastMailDto } from '../dto/send-hourly-forecast-mail.dto';
 
-export abstract class MailService {
+export abstract class AbstractMailService {
   abstract sendSubscriptionConfirmation(
     dto: SendConfirmationMailDto
   ): Promise<void>;

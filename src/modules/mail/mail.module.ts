@@ -5,8 +5,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
-import { MailService } from './contracts/mail.service';
-import { MailServiceImpl } from './mail.serviceImpl';
+import { AbstractMailService } from './abstracts/mail.service.abstract';
+import { MailService } from './mail.serviceImpl';
 
 @Module({
   imports: [
@@ -37,10 +37,10 @@ import { MailServiceImpl } from './mail.serviceImpl';
   ],
   providers: [
     {
-      provide: MailService,
-      useClass: MailServiceImpl,
+      provide: AbstractMailService,
+      useClass: MailService,
     },
   ],
-  exports: [MailService],
+  exports: [AbstractMailService],
 })
 export class MailModule {}
