@@ -1,4 +1,4 @@
-export class WeatherAPIErrorDto {
+export interface WeatherAPIErrorDto {
   error: {
     code: number;
     message: string;
