@@ -8,8 +8,8 @@ import * as Joi from 'joi';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { JobsModule } from './jobs/jobs.module';
 import { MailModule } from './mail/mail.module';
+import { NotifierModule } from './notifier/notifier.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { WeatherModule } from './weather/weather.module';
 
@@ -36,7 +36,7 @@ import { WeatherModule } from './weather/weather.module';
     SubscriptionsModule,
     MailModule,
     WeatherModule,
-    JobsModule,
+    NotifierModule,
   ],
   controllers: [AppController],
   providers: [AppService],
