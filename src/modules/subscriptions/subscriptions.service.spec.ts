@@ -25,7 +25,7 @@ describe('SubscriptionsService', () => {
           useValue: {
             findDuplicateSubscription: jest.fn(),
             createSubscription: jest.fn(),
-            getSubscription: jest.fn(),
+            getSubscriptions: jest.fn(),
             findSubscriptionByToken: jest.fn(),
             confirmSubscription: jest.fn(),
             deleteSubscription: jest.fn(),
@@ -169,11 +169,11 @@ describe('SubscriptionsService', () => {
         },
       ];
 
-      repository.getSubscription.mockResolvedValue(mockSubscriptions);
+      repository.getSubscriptions.mockResolvedValue(mockSubscriptions);
 
       const result = await service.getDailySubscribers();
 
-      expect(repository.getSubscription).toHaveBeenCalledWith(
+      expect(repository.getSubscriptions).toHaveBeenCalledWith(
         SubscriptionType.DAILY
       );
       expect(result).toEqual(mockSubscriptions);
@@ -193,11 +193,11 @@ describe('SubscriptionsService', () => {
         },
       ];
 
-      repository.getSubscription.mockResolvedValue(mockSubscriptions);
+      repository.getSubscriptions.mockResolvedValue(mockSubscriptions);
 
       const result = await service.getHourlySubscribers();
 
-      expect(repository.getSubscription).toHaveBeenCalledWith(
+      expect(repository.getSubscriptions).toHaveBeenCalledWith(
         SubscriptionType.HOURLY
       );
       expect(result).toEqual(mockSubscriptions);

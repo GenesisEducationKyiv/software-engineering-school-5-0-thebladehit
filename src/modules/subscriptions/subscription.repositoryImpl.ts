@@ -10,7 +10,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  getSubscription(type: SubscriptionType): Promise<Subscription[]> {
+  getSubscriptions(type: SubscriptionType): Promise<Subscription[]> {
     return this.prismaService.subscription.findMany({
       where: {
         type,
