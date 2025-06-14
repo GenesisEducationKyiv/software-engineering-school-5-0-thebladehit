@@ -22,16 +22,18 @@ export class SubscriptionsController {
   }
 
   @Get('/confirm/:token')
-  async confirmSubscription(@Param('token') token: string): Promise<string> {
+  async confirmSubscription(
+    @Param('token') token: string
+  ): Promise<{ status: string; message: string }> {
     await this.subscriptionsService.confirmSubscription(token);
-    return 'Subscription confirmed successfully';
+    return { status: 'ok', message: 'Subscription confirmed successfully' };
   }
 
   @Get('/unsubscribe/:token')
   async unsubscribeSubscription(
     @Param('token') token: string
-  ): Promise<string> {
+  ): Promise<{ status: string; message: string }> {
     await this.subscriptionsService.unsubscribeSubscription(token);
-    return 'Unsubscribed successfully';
+    return { status: 'ok', message: 'Unsubscribed successfully' };
   }
 }
