@@ -7,7 +7,7 @@ import {
 import { Subscription, SubscriptionType } from '@prisma/client';
 
 import { CityService } from '../city/city.service';
-import { MailService } from '../mail/contracts/mail.service';
+import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -17,7 +17,7 @@ export class SubscriptionsService {
   constructor(
     private readonly subscriptionRepository: AbstractSubscriptionRepository,
     private readonly cityService: CityService,
-    private readonly mailService: MailService
+    private readonly mailService: AbstractMailService
   ) {}
 
   getDailySubscribers(): Promise<Subscription[]> {

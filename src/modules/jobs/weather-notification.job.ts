@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { Subscription } from '@prisma/client';
 
-import { MailService } from '../mail/contracts/mail.service';
+import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { WeatherDailyForecastDto } from '../weather/dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from '../weather/dto/weather-hourly-forecast.dto';
@@ -13,7 +13,7 @@ export class WeatherNotificationService {
   constructor(
     private readonly weatherService: WeatherService,
     private readonly subscriptionService: SubscriptionsService,
-    private readonly mailService: MailService
+    private readonly mailService: AbstractMailService
   ) {}
 
   @Cron('30 8 * * *')
