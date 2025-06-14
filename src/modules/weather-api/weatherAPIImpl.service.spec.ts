@@ -1,15 +1,13 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { InvalidCityException } from '../errors/invalid-city.exception';
-import { WeatherApiService } from '../external-contracts/weather-api.service';
-
-import { WeatherAPIImplService } from './weatherAPIImpl.service';
-
+import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
+import { WeatherAPIService } from './weather-api.service';
+import { NotFoundException } from '@nestjs/common';
 const fakeAPIUrl = 'http://fake-api.com';
 
 describe('WeatherAPIImplService', () => {
-  let service: WeatherApiService;
+  let service: AbstractWeatherApiService;
   const mockConfigService = {
     getOrThrow: jest.fn().mockReturnValue('test-api-key'),
     get: jest.fn((key: string) => {
@@ -23,8 +21,8 @@ describe('WeatherAPIImplService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
-          provide: WeatherApiService,
-          useClass: WeatherAPIImplService,
+          provide: AbstractWeatherApiService,
+          useClass: WeatherAPIService,
         },
         {
           provide: ConfigService,
@@ -33,7 +31,7 @@ describe('WeatherAPIImplService', () => {
       ],
     }).compile();
 
-    service = module.get(WeatherApiService);
+    service = module.get(AbstractWeatherApiService);
     global.fetch = jest.fn();
     jest.clearAllMocks();
   });
@@ -107,7 +105,7 @@ describe('WeatherAPIImplService', () => {
       });
 
       await expect(service.getWeather(city)).rejects.toThrow(
-        InvalidCityException
+        NotFoundException
       );
     });
 
