@@ -24,12 +24,23 @@ enum SubscriptionType {
 model Subscription {
   id          String           @id @default(uuid())
   type        SubscriptionType
-  city        String
   isConfirmed Boolean          @default(false)
   createdAt   DateTime         @default(now()) @map("created_at")
+
+  cityId String @map("city_id")
+  city   City   @relation(fields: [cityId], references: [id], onDelete: NoAction)
 
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("subscriptions")
+}
+
+model City {
+  id   String @id @default(uuid())
+  name String @unique
+
+  subscriptions Subscription[]
+
+  @@map("cities")
 }
