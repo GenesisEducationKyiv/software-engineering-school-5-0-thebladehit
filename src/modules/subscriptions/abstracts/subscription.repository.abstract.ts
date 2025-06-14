@@ -5,9 +5,9 @@ import { CreateSubscriptionDto } from '../dto/create-subscription.dto';
 export abstract class AbstractSubscriptionRepository {
   abstract getSubscriptions(type: SubscriptionType): Promise<Subscription[]>;
   abstract findSubscriptionByToken(token: string): Promise<Subscription>;
-  abstract findDuplicateSubscription(
+  abstract isDuplicateSubscription(
     dto: CreateSubscriptionDto
-  ): Promise<Subscription>;
+  ): Promise<boolean>;
   abstract createSubscription(
     dto: CreateSubscriptionDto
   ): Promise<Subscription>;
