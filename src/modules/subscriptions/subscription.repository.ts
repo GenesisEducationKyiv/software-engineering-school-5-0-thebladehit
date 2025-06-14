@@ -32,21 +32,28 @@ export class SubscriptionRepository implements AbstractSubscriptionRepository {
     });
   }
 
-  findDuplicateSubscription(dto: CreateSubscriptionDto): Promise<Subscription> {
-    return this.prismaService.subscription.findFirst({
+  async isDuplicateSubscription(dto: CreateSubscriptionDto): Promise<boolean> {
+    const subscription = await this.prismaService.subscription.findFirst({
       where: {
         type: dto.frequency,
-        city: dto.city,
+        city: { name: dto.city },
         user: { email: dto.email },
       },
+      select: { id: true },
     });
+    return Boolean(subscription);
   }
 
   createSubscription(dto: CreateSubscriptionDto): Promise<Subscription> {
     return this.prismaService.subscription.create({
       data: {
         type: dto.frequency,
-        city: dto.city,
+        city: {
+          connectOrCreate: {
+            create: { name: dto.city },
+            where: { name: dto.city },
+          },
+        },
         user: {
           connectOrCreate: {
             where: { email: dto.email },

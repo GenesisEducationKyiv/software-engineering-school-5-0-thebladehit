@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Subscription, SubscriptionType } from '@prisma/client';
 
+import { CityService } from '../city/city.service';
 import { MailService } from '../mail/contracts/mail.service';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
@@ -15,6 +16,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 export class SubscriptionsService {
   constructor(
     private readonly subscriptionRepository: AbstractSubscriptionRepository,
+    private readonly cityService: CityService,
     private readonly mailService: MailService
   ) {}
 
@@ -29,11 +31,12 @@ export class SubscriptionsService {
   }
 
   async createSubscription(dto: CreateSubscriptionDto): Promise<void> {
-    const existingSubscription =
-      await this.subscriptionRepository.findDuplicateSubscription(dto);
-    if (existingSubscription) {
+    const isDuplicate =
+      await this.subscriptionRepository.isDuplicateSubscription(dto);
+    if (isDuplicate) {
       throw new ConflictException('You already subscribed to this city.');
     }
+    await this.cityService.validateCity(dto.city);
     const subscription =
       await this.subscriptionRepository.createSubscription(dto);
     await this.mailService.sendSubscriptionConfirmation({
