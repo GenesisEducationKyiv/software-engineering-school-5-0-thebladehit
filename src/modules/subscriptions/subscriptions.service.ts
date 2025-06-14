@@ -8,13 +8,13 @@ import { Subscription, SubscriptionType } from '@prisma/client';
 
 import { MailService } from '../mail/contracts/mail.service';
 
-import { SubscriptionRepository } from './contracts/subscription.repository';
+import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
-    private readonly subscriptionRepository: SubscriptionRepository,
+    private readonly subscriptionRepository: AbstractSubscriptionRepository,
     private readonly mailService: MailService
   ) {}
 
@@ -23,7 +23,9 @@ export class SubscriptionsService {
   }
 
   getHourlySubscribers(): Promise<Subscription[]> {
-    return this.subscriptionRepository.getSubscriptions(SubscriptionType.HOURLY);
+    return this.subscriptionRepository.getSubscriptions(
+      SubscriptionType.HOURLY
+    );
   }
 
   async createSubscription(dto: CreateSubscriptionDto): Promise<void> {
@@ -34,7 +36,7 @@ export class SubscriptionsService {
     }
     const subscription =
       await this.subscriptionRepository.createSubscription(dto);
-    this.mailService.sendSubscriptionConfirmation({
+    await this.mailService.sendSubscriptionConfirmation({
       email: dto.email,
       token: subscription.id,
       city: dto.city,
