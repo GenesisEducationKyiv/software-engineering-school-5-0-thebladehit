@@ -11,6 +11,7 @@ import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { SubscriptionWithUserAndCity } from './types/subscription-restult';
 
 @Injectable()
 export class SubscriptionsService {
@@ -20,11 +21,11 @@ export class SubscriptionsService {
     private readonly mailService: AbstractMailService
   ) {}
 
-  getDailySubscribers(): Promise<Subscription[]> {
+  getDailySubscribers(): Promise<SubscriptionWithUserAndCity[]> {
     return this.subscriptionRepository.getSubscriptions(SubscriptionType.DAILY);
   }
 
-  getHourlySubscribers(): Promise<Subscription[]> {
+  getHourlySubscribers(): Promise<SubscriptionWithUserAndCity[]> {
     return this.subscriptionRepository.getSubscriptions(
       SubscriptionType.HOURLY
     );
@@ -55,7 +56,7 @@ export class SubscriptionsService {
     }
     if (subscription.isConfirmed) {
       throw new BadRequestException(
-        'You have already confirm this subscription'
+        'You have already confirm this subscriptions'
       );
     }
     await this.subscriptionRepository.confirmSubscription(token);

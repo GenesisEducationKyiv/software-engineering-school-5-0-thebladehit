@@ -5,12 +5,15 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { SubscriptionWithUserAndCity } from './types/subscription-restult';
 
 @Injectable()
 export class SubscriptionRepository implements AbstractSubscriptionRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  getSubscriptions(type: SubscriptionType): Promise<Subscription[]> {
+  getSubscriptions(
+    type: SubscriptionType
+  ): Promise<SubscriptionWithUserAndCity[]> {
     return this.prismaService.subscription.findMany({
       where: {
         type,
@@ -18,9 +21,10 @@ export class SubscriptionRepository implements AbstractSubscriptionRepository {
       },
       include: {
         user: {
-          select: {
-            email: true,
-          },
+          select: { email: true },
+        },
+        city: {
+          select: { name: true },
         },
       },
     });
