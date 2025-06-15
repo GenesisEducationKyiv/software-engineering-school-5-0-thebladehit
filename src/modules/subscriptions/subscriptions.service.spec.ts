@@ -11,7 +11,7 @@ import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { SubscriptionsService } from './subscriptions.service';
-import { SubscriptionWithUserAndCity } from './types/subscription-restult';
+import { SubscriptionWithUserAndCity } from './types/subscription-with-user-city';
 
 describe('SubscriptionsService', () => {
   let service: SubscriptionsService;
