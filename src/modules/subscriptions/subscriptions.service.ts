@@ -6,35 +6,41 @@ import {
 } from '@nestjs/common';
 import { Subscription, SubscriptionType } from '@prisma/client';
 
-import { MailService } from '../mail/contracts/mail.service';
+import { CityService } from '../city/city.service';
+import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
 
-import { SubscriptionRepository } from './contracts/subscription.repository';
+import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { SubscriptionWithUserAndCity } from './types/subscription-restult';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
-    private readonly subscriptionRepository: SubscriptionRepository,
-    private readonly mailService: MailService
+    private readonly subscriptionRepository: AbstractSubscriptionRepository,
+    private readonly cityService: CityService,
+    private readonly mailService: AbstractMailService
   ) {}
 
-  getDailySubscribers(): Promise<Subscription[]> {
-    return this.subscriptionRepository.getSubscription(SubscriptionType.DAILY);
+  getDailySubscribers(): Promise<SubscriptionWithUserAndCity[]> {
+    return this.subscriptionRepository.getSubscriptions(SubscriptionType.DAILY);
   }
 
-  getHourlySubscribers(): Promise<Subscription[]> {
-    return this.subscriptionRepository.getSubscription(SubscriptionType.HOURLY);
+  getHourlySubscribers(): Promise<SubscriptionWithUserAndCity[]> {
+    return this.subscriptionRepository.getSubscriptions(
+      SubscriptionType.HOURLY
+    );
   }
 
   async createSubscription(dto: CreateSubscriptionDto): Promise<void> {
-    const existingSubscription =
-      await this.subscriptionRepository.findDuplicateSubscription(dto);
-    if (existingSubscription) {
+    const isDuplicate =
+      await this.subscriptionRepository.isDuplicateSubscription(dto);
+    if (isDuplicate) {
       throw new ConflictException('You already subscribed to this city.');
     }
+    await this.cityService.validateCity(dto.city);
     const subscription =
       await this.subscriptionRepository.createSubscription(dto);
-    this.mailService.sendSubscriptionConfirmation({
+    await this.mailService.sendSubscriptionConfirmation({
       email: dto.email,
       token: subscription.id,
       city: dto.city,
@@ -50,7 +56,7 @@ export class SubscriptionsService {
     }
     if (subscription.isConfirmed) {
       throw new BadRequestException(
-        'You have already confirm this subscription'
+        'You have already confirm this subscriptions'
       );
     }
     await this.subscriptionRepository.confirmSubscription(token);
