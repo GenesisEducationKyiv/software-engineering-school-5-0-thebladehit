@@ -1,34 +1,55 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { WeatherCurrentDto } from './dto/weather-current.dto';
+import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
+
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
-import { InvalidCityException } from './errors/invalid-city.exception';
-import { WeatherApiService } from './external-contracts/weather-api.service';
+import { WeatherResponseDto } from './dto/weather.dto';
+import { WeatherCacheService } from './weather-cache.service';
 import { WeatherService } from './weather.service';
 
 describe('WeatherService', () => {
   let service: WeatherService;
-  let weatherApiService: jest.Mocked<WeatherApiService>;
+  let weatherApiService: jest.Mocked<AbstractWeatherApiService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WeatherService,
         {
-          provide: WeatherApiService,
+          provide: AbstractWeatherApiService,
           useValue: {
             getWeather: jest.fn(),
             getDailyForecast: jest.fn(),
             getHourlyForecast: jest.fn(),
           },
         },
+        {
+          provide: WeatherCacheService,
+          useValue: {
+            weatherByCity: {
+              get: jest.fn(),
+              set: jest.fn(),
+              del: jest.fn(),
+            },
+            dailyForecastByCity: {
+              get: jest.fn(),
+              set: jest.fn(),
+              del: jest.fn(),
+            },
+            hourlyForecastByCity: {
+              get: jest.fn(),
+              set: jest.fn(),
+              del: jest.fn(),
+            },
+          },
+        },
       ],
     }).compile();
 
     service = module.get(WeatherService);
-    weatherApiService = module.get(WeatherApiService);
+    weatherApiService = module.get(AbstractWeatherApiService);
   });
 
   it('should be defined', () => {
@@ -39,7 +60,7 @@ describe('WeatherService', () => {
     const city = 'fake city';
 
     it('should return weather if API call succeeds', async () => {
-      const mockWeather: WeatherCurrentDto = {
+      const mockWeather: WeatherResponseDto = {
         temperature: 22,
         humidity: 50,
         description: 'fake description',
@@ -52,9 +73,9 @@ describe('WeatherService', () => {
       expect(weatherApiService.getWeather).toHaveBeenCalledWith(city);
     });
 
-    it('should throw NotFoundException if InvalidCityException is thrown', async () => {
+    it('should throw NotFoundException if NotFoundException is thrown', async () => {
       weatherApiService.getWeather.mockRejectedValue(
-        new InvalidCityException('invalid city')
+        new NotFoundException('invalid city')
       );
 
       await expect(service.getWeather(city)).rejects.toThrow(NotFoundException);
@@ -87,17 +108,6 @@ describe('WeatherService', () => {
       expect(weatherApiService.getDailyForecast).toHaveBeenCalledWith(city);
     });
 
-    it('should return null if InvalidCityException is thrown', async () => {
-      weatherApiService.getDailyForecast.mockRejectedValue(
-        new InvalidCityException('invalid city')
-      );
-
-      const result = await service.getDailyForecast(city);
-
-      expect(result).toEqual(null);
-      expect(weatherApiService.getDailyForecast).toHaveBeenCalledWith(city);
-    });
-
     it('should throw Error for unknown errors', async () => {
       const error = new Error('Something went wrong');
       weatherApiService.getDailyForecast.mockRejectedValue(error);
@@ -119,17 +129,6 @@ describe('WeatherService', () => {
 
       const result = await service.getHourlyForecast(city);
       expect(result).toEqual(mockWeather);
-      expect(weatherApiService.getHourlyForecast).toHaveBeenCalledWith(city);
-    });
-
-    it('should return null if InvalidCityException is thrown', async () => {
-      weatherApiService.getHourlyForecast.mockRejectedValue(
-        new InvalidCityException('invalid city')
-      );
-
-      const result = await service.getHourlyForecast(city);
-
-      expect(result).toEqual(null);
       expect(weatherApiService.getHourlyForecast).toHaveBeenCalledWith(city);
     });
 

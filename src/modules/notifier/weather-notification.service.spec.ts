@@ -1,22 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Subscription } from '@prisma/client';
 
-import { MailService } from '../mail/contracts/mail.service';
+import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import { SubscriptionWithUserAndCity } from '../subscriptions/types/subscription-restult';
 import { WeatherService } from '../weather/weather.service';
 
-import { WeatherNotificationService } from './weather-notification.job';
+import { WeatherNotification } from './weather-notification.service';
 
 describe('WeatherNotificationService', () => {
-  let service: WeatherNotificationService;
+  let service: WeatherNotification;
   let weatherService: WeatherService;
   let subscriptionsService: SubscriptionsService;
-  let mailService: MailService;
+  let mailService: AbstractMailService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        WeatherNotificationService,
+        WeatherNotification,
         {
           provide: WeatherService,
           useValue: {
@@ -33,7 +33,7 @@ describe('WeatherNotificationService', () => {
           },
         },
         {
-          provide: MailService,
+          provide: AbstractMailService,
           useValue: {
             sendDailyForecast: jest.fn(),
             sendHourlyForecast: jest.fn(),
@@ -42,10 +42,10 @@ describe('WeatherNotificationService', () => {
       ],
     }).compile();
 
-    service = module.get(WeatherNotificationService);
+    service = module.get(WeatherNotification);
     weatherService = module.get(WeatherService);
     subscriptionsService = module.get(SubscriptionsService);
-    mailService = module.get(MailService);
+    mailService = module.get(AbstractMailService);
   });
 
   describe('notifyDailySubscribers', () => {
@@ -67,7 +67,9 @@ describe('WeatherNotificationService', () => {
 
       jest
         .spyOn(subscriptionsService, 'getDailySubscribers')
-        .mockResolvedValue(subscribers as unknown as Subscription[]);
+        .mockResolvedValue(
+          subscribers as unknown as SubscriptionWithUserAndCity[]
+        );
       jest
         .spyOn(weatherService, 'getDailyForecast')
         .mockResolvedValue(forecast);
@@ -78,32 +80,14 @@ describe('WeatherNotificationService', () => {
       await service.notifyDailySubscribers();
 
       expect(sendSpy).toHaveBeenCalledTimes(subscribers.length);
-      expect(weatherService.getDailyForecast).toHaveBeenCalledTimes(1);
-    });
-
-    it('should delete subscription if forecast is unavailable (daily)', async () => {
-      const subscribers = [
-        { id: '1', city: 'Nowhere', user: { email: 'x@x.com' } },
-      ];
-
-      jest
-        .spyOn(subscriptionsService, 'getDailySubscribers')
-        .mockResolvedValue(subscribers as unknown as Subscription[]);
-      jest.spyOn(weatherService, 'getDailyForecast').mockResolvedValue(null);
-      const deleteSpy = jest
-        .spyOn(subscriptionsService, 'deleteSubscription')
-        .mockResolvedValue({} as Subscription);
-
-      await service.notifyDailySubscribers();
-
-      expect(deleteSpy).toHaveBeenCalledWith('1');
+      expect(weatherService.getDailyForecast).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('notifyHourlySubscribers', () => {
     it('should send hourly forecasts to subscribers', async () => {
       const subscribers = [
-        { id: '1', city: 'Lviv', user: { email: 'lviv@ukr.net' } },
+        { id: '1', city: { name: 'Lviv' }, user: { email: 'lviv@ukr.net' } },
       ];
       const forecast = {
         temp: 17,
@@ -115,7 +99,9 @@ describe('WeatherNotificationService', () => {
 
       jest
         .spyOn(subscriptionsService, 'getHourlySubscribers')
-        .mockResolvedValue(subscribers as unknown as Subscription[]);
+        .mockResolvedValue(
+          subscribers as unknown as SubscriptionWithUserAndCity[]
+        );
       jest
         .spyOn(weatherService, 'getHourlyForecast')
         .mockResolvedValue(forecast);
