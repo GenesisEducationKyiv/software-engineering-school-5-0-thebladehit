@@ -61,13 +61,10 @@ export class WeatherAPIService implements AbstractWeatherApiService {
     const response =
       await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
     const dayForecast = response.forecast.forecastday[0];
-    if (!dayForecast) {
+    if (!dayForecast || !dayForecast.hour[0]) {
       throw new InternalServerErrorException();
     }
     const hourForecast = dayForecast.hour[0];
-    if (!hourForecast) {
-      throw new InternalServerErrorException();
-    }
     return {
       temp: hourForecast.temp_c,
       description: hourForecast.condition.text,
