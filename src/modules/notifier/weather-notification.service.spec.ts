@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
-import { SubscriptionWithUserAndCity } from '../subscriptions/types/subscription-restult';
+import { SubscriptionWithUserAndCity } from '../subscriptions/types/subscription-with-user-city';
 import { WeatherService } from '../weather/weather.service';
 
 import { WeatherNotification } from './weather-notification.service';
