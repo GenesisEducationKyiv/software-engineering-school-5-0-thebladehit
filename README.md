@@ -185,10 +185,10 @@ npm run test
 ```
 
 Include unit tests for key services:
-- [WeatherNotificationService](src/modules/jobs/weather-notification.job.spec.ts)
+- [WeatherNotificationService](src/modules/notifier/weather-notification.service.spec.ts)
 - [MailServiceImpl](./src/modules/mail/mail.service.spec.ts)
-- [SubscriptionsService](./src/modules/subscriptions/subscriptions.service.spec.ts)
+- [SubscriptionsService](src/modules/subscriptions/subscriptions.service.spec.ts)
 - [WeatherService](./src/modules/weather/weather.service.spec.ts)
-- [WeatherAPIImplService](./src/modules/weather/external-providers/weatherAPIImpl.service.spec.ts)
+- [WeatherAPIImplService](src/modules/weather-api/weather-api.service.spec.ts)
 
 ---
