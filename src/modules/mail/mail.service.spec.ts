@@ -3,16 +3,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SubscriptionType } from '@prisma/client';
 
-import { MailService } from './contracts/mail.service';
+import { AbstractMailService } from './abstracts/mail.service.abstract';
 import { SendConfirmationMailDto } from './dto/send-confirmation-mail.dto';
 import { SendDailyForecastMailDto } from './dto/send-daily-forecast-mail.dto';
 import { SendHourlyForecastMailDto } from './dto/send-hourly-forecast-mail.dto';
-import { MailServiceImpl } from './mail.serviceImpl';
+import { MailService } from './mail.serviceImpl';
 
 const fakeAPIUrl = 'http://fake-api.com';
 
 describe('MailServiceImpl', () => {
-  let service: MailService;
+  let service: AbstractMailService;
   let mailerService: MailerService;
 
   const mockMailerService = {
@@ -29,13 +29,13 @@ describe('MailServiceImpl', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        { provide: MailService, useClass: MailServiceImpl },
+        { provide: AbstractMailService, useClass: MailService },
         { provide: MailerService, useValue: mockMailerService },
         { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
-    service = module.get(MailService);
+    service = module.get(AbstractMailService);
     mailerService = module.get(MailerService);
     jest.clearAllMocks();
   });

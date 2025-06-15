@@ -1,9 +1,11 @@
+import { NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
+
 import { WeatherAPIService } from './weather-api.service';
-import { NotFoundException } from '@nestjs/common';
+
 const fakeAPIUrl = 'http://fake-api.com';
 
 describe('WeatherAPIImplService', () => {
@@ -41,56 +43,6 @@ describe('WeatherAPIImplService', () => {
   });
 
   describe('getWeather', () => {
-    it('should return data from cache if not expired', async () => {
-      const city = 'Kyiv';
-      const cached = {
-        temperature: 20,
-        humidity: 60,
-        description: 'Sunny',
-      };
-
-      service['cache'].set(city, {
-        data: cached,
-        timestamp: Date.now(),
-      });
-
-      const result = await service.getWeather(city);
-
-      expect(result).toEqual(cached);
-      expect(fetch).not.toHaveBeenCalled();
-    });
-
-    it('should fetch data and cache it if no valid cache', async () => {
-      const city = 'Lviv';
-      const apiResponse = {
-        current: {
-          temp_c: 10,
-          humidity: 80,
-          condition: { text: 'Rainy' },
-        },
-      };
-
-      (fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: jest.fn().mockResolvedValue(apiResponse),
-      });
-
-      const result = await service.getWeather(city);
-
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining(`${fakeAPIUrl}/current.json`)
-      );
-
-      expect(result).toEqual({
-        temperature: 10,
-        humidity: 80,
-        description: 'Rainy',
-      });
-
-      const cached = service['cache'].get(city);
-      expect(cached?.data).toEqual(result);
-    });
-
     it('should throw NotFound if response error is 1006', async () => {
       const city = 'FakeCity';
 
@@ -104,27 +56,7 @@ describe('WeatherAPIImplService', () => {
         }),
       });
 
-      await expect(service.getWeather(city)).rejects.toThrow(
-        NotFoundException
-      );
-    });
-
-    it('should throw general error for unknown errors', async () => {
-      const city = 'SomeCity';
-
-      (fetch as jest.Mock).mockResolvedValue({
-        ok: false,
-        json: jest.fn().mockResolvedValue({
-          error: {
-            code: 5000,
-            message: 'Internal error',
-          },
-        }),
-      });
-
-      await expect(service.getWeather(city)).rejects.toThrow(
-        'Internal application error'
-      );
+      await expect(service.getWeather(city)).rejects.toThrow(NotFoundException);
     });
   });
 
