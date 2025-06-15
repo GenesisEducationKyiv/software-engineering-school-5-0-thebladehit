@@ -1,7 +1,7 @@
 export interface ForecastResponseDto {
   forecast: {
     forecastday: ForecastDay[];
-  }
+  };
 }
 
 export interface ForecastDay {
