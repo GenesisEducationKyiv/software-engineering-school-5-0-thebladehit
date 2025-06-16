@@ -45,6 +45,7 @@ describe('WeatherNotificationService', () => {
     }).compile();
 
     service = module.get(WeatherNotification);
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
