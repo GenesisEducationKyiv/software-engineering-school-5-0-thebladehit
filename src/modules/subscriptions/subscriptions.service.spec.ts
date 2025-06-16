@@ -17,6 +17,7 @@ describe('SubscriptionsService', () => {
   let service: SubscriptionsService;
   let repository: jest.Mocked<AbstractSubscriptionRepository>;
   let mailService: jest.Mocked<AbstractMailService>;
+  let cityService: jest.Mocked<CityService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,7 +43,7 @@ describe('SubscriptionsService', () => {
         {
           provide: CityService,
           useValue: {
-            validateCity: jest.fn(),
+            getCityId: jest.fn(),
           },
         },
       ],
@@ -51,6 +52,7 @@ describe('SubscriptionsService', () => {
     service = module.get(SubscriptionsService);
     repository = module.get(AbstractSubscriptionRepository);
     mailService = module.get(AbstractMailService);
+    cityService = module.get(CityService);
   });
 
   it('should be defined', () => {
@@ -77,10 +79,11 @@ describe('SubscriptionsService', () => {
       repository.createSubscription.mockResolvedValue({
         id: 'token123',
       } as Subscription);
+      cityService.getCityId.mockResolvedValue('cityId');
 
       await service.createSubscription(dto);
 
-      expect(repository.createSubscription).toHaveBeenCalledWith(dto);
+      expect(repository.createSubscription).toHaveBeenCalledWith(dto, 'cityId');
       expect(mailService.sendSubscriptionConfirmation).toHaveBeenCalledWith({
         email: dto.email,
         city: dto.city,

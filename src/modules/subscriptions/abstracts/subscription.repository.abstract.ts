@@ -12,7 +12,8 @@ export abstract class AbstractSubscriptionRepository {
     dto: CreateSubscriptionDto
   ): Promise<boolean>;
   abstract createSubscription(
-    dto: CreateSubscriptionDto
+    dto: CreateSubscriptionDto,
+    cityId: string
   ): Promise<Subscription>;
   abstract confirmSubscription(token: string): Promise<Subscription>;
   abstract deleteSubscription(token: string): Promise<Subscription>;

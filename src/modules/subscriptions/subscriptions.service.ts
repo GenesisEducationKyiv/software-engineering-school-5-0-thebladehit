@@ -37,9 +37,11 @@ export class SubscriptionsService {
     if (isDuplicate) {
       throw new ConflictException('You already subscribed to this city.');
     }
-    await this.cityService.validateCity(dto.city);
-    const subscription =
-      await this.subscriptionRepository.createSubscription(dto);
+    const cityId = await this.cityService.getCityId(dto.city);
+    const subscription = await this.subscriptionRepository.createSubscription(
+      dto,
+      cityId
+    );
     await this.mailService.sendSubscriptionConfirmation({
       email: dto.email,
       token: subscription.id,

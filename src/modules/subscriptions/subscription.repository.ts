@@ -48,16 +48,14 @@ export class SubscriptionRepository implements AbstractSubscriptionRepository {
     return Boolean(subscription);
   }
 
-  createSubscription(dto: CreateSubscriptionDto): Promise<Subscription> {
+  createSubscription(
+    dto: CreateSubscriptionDto,
+    cityId: string
+  ): Promise<Subscription> {
     return this.prismaService.subscription.create({
       data: {
         type: dto.frequency,
-        city: {
-          connectOrCreate: {
-            create: { name: dto.city },
-            where: { name: dto.city },
-          },
-        },
+        city: { connect: { id: cityId } },
         user: {
           connectOrCreate: {
             where: { email: dto.email },
