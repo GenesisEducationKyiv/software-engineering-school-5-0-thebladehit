@@ -1,18 +1,14 @@
 import { HttpService } from '@nestjs/axios';
-import { NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AxiosResponse } from 'axios';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 
-import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
-
-import { WeatherAPIService } from './weather-api.service';
+import { WeatherAPIService } from '../../../src/modules/weather-api/weather-api.service';
 
 describe('WeatherAPIService', () => {
-  let service: AbstractWeatherApiService;
+  let service: WeatherAPIService;
 
-  const mockConfigService = {
+  const mockedConfigService = {
     getOrThrow: jest.fn().mockReturnValue('test-api-key'),
     get: jest.fn((key: string) => {
       if (key === 'WEATHER_CACHE_TTL') return 600_000;
@@ -21,29 +17,26 @@ describe('WeatherAPIService', () => {
     }),
   };
 
-  const mockHttpService = {
+  const mockedHttpService = {
     get: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        {
-          provide: AbstractWeatherApiService,
-          useClass: WeatherAPIService,
-        },
+        WeatherAPIService,
         {
           provide: ConfigService,
-          useValue: mockConfigService,
+          useValue: mockedConfigService,
         },
         {
           provide: HttpService,
-          useValue: mockHttpService,
+          useValue: mockedHttpService,
         },
       ],
     }).compile();
 
-    service = module.get(AbstractWeatherApiService);
+    service = module.get(WeatherAPIService);
     jest.clearAllMocks();
   });
 
@@ -52,20 +45,30 @@ describe('WeatherAPIService', () => {
   });
 
   describe('getWeather', () => {
-    it('should throw NotFound if response error is 1006', async () => {
-      const city = 'FakeCity';
-
-      const errorResponse = {
-        response: {
-          data: {
-            error: { code: 1006, message: 'No matching location found.' },
+    it('should return weather data', async () => {
+      const city = 'fake city';
+      const mockWeatherResponse = {
+        data: {
+          current: {
+            condition: {
+              text: 'cloudy',
+            },
+            humidity: 5,
+            temp_c: 20,
           },
         },
       };
 
-      mockHttpService.get.mockReturnValue(throwError(() => errorResponse));
+      mockedHttpService.get.mockReturnValue(of(mockWeatherResponse));
 
-      await expect(service.getWeather(city)).rejects.toThrow(NotFoundException);
+      const result = await service.getWeather(city);
+
+      expect(result).toEqual({
+        temperature: 20,
+        humidity: 5,
+        description: 'cloudy',
+      });
+      expect(mockedHttpService.get).toHaveBeenCalled();
     });
   });
 
@@ -73,7 +76,7 @@ describe('WeatherAPIService', () => {
     it('should return daily forecast', async () => {
       const city = 'Dnipro';
 
-      const mockData: AxiosResponse = {
+      const mockData = {
         data: {
           forecast: {
             forecastday: [
@@ -94,15 +97,9 @@ describe('WeatherAPIService', () => {
             ],
           },
         },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {
-          headers: undefined,
-        },
       };
 
-      mockHttpService.get.mockReturnValue(of(mockData));
+      mockedHttpService.get.mockReturnValue(of(mockData));
 
       const result = await service.getDailyForecast(city);
 
@@ -123,7 +120,7 @@ describe('WeatherAPIService', () => {
     it('should return hourly forecast', async () => {
       const city = 'Odesa';
 
-      const mockData: AxiosResponse = {
+      const mockData = {
         data: {
           forecast: {
             forecastday: [
@@ -141,15 +138,9 @@ describe('WeatherAPIService', () => {
             ],
           },
         },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {
-          headers: undefined,
-        },
       };
 
-      mockHttpService.get.mockReturnValue(of(mockData));
+      mockedHttpService.get.mockReturnValue(of(mockData));
 
       const result = await service.getHourlyForecast(city);
 
