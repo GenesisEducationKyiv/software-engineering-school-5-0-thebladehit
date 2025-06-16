@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 
 import { AbstractCityApiService } from '../abstracts/city-api.abstract';
@@ -9,7 +10,7 @@ import { CityRepository } from './city.repository';
 import { CityService } from './city.service';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, HttpModule],
   providers: [
     CityService,
     {
