@@ -1,9 +1,11 @@
+import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { catchError, firstValueFrom, map } from 'rxjs';
 
 import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
 import { WeatherDailyForecastDto } from '../weather/dto/weather-daily-forecast.dto';
@@ -20,7 +22,10 @@ export class WeatherAPIService implements AbstractWeatherApiService {
   private readonly baseURL: string;
   private readonly apiKey: string;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService
+  ) {
     this.apiKey = this.configService.getOrThrow<string>('WEATHER_API_KEY');
     this.baseURL = this.configService.get<string>('WEATHER_BASE_URL');
   }
@@ -75,15 +80,17 @@ export class WeatherAPIService implements AbstractWeatherApiService {
   }
 
   private async fetchWeatherDataFromAPI<T>(url: string): Promise<T> {
-    const response = await fetch(url);
-    if (!response.ok) {
-      const errorBody: WeatherAPIErrorDto = await response.json();
-      if (errorBody.error.code === 1006) {
-        throw new NotFoundException();
-      } else {
-        throw new InternalServerErrorException();
-      }
-    }
-    return response.json();
+    return firstValueFrom(
+      this.httpService.get<T>(url).pipe(
+        map((response) => response.data),
+        catchError((error) => {
+          const data = error?.response?.data as WeatherAPIErrorDto;
+          if (data?.error?.code === 1006) {
+            throw new NotFoundException();
+          }
+          throw new InternalServerErrorException();
+        })
+      )
+    );
   }
 }

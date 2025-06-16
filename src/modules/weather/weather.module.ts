@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 
@@ -9,7 +10,12 @@ import { WeatherController } from './weather.controller';
 import { WeatherService } from './weather.service';
 
 @Module({
-  imports: [CacheModule.register()],
+  imports: [
+    CacheModule.register(),
+    HttpModule.register({
+      timeout: 2000,
+    }),
+  ],
   controllers: [WeatherController],
   providers: [
     WeatherService,
