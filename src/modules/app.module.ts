@@ -25,6 +25,8 @@ import { WeatherModule } from './weather/weather.module';
         BACK_BASE_URL: Joi.string().required(),
         WEATHER_API_KEY: Joi.string().required(),
         WEATHER_CACHE_TTL: Joi.number().integer().required(),
+        DAILY_FORECAST_CACHE_TTL: Joi.number().integer().required(),
+        HOURLY_FORECAST_CACHE_TTL: Joi.number().integer().required(),
         WEATHER_BASE_URL: Joi.string().required(),
       }),
     }),
