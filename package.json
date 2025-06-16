@@ -14,10 +14,12 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
+    "test:integration": "jest --config ./test/integration/jest.integration.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:migrate:deploy": "prisma migrate deploy --schema=./src/prisma/schema.prisma"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -45,6 +47,7 @@
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.4.17",
+    "@testcontainers/postgresql": "^11.0.3",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
@@ -84,6 +87,7 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
+    "testPathIgnorePatterns": ["<rootDir>/dist/"],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
