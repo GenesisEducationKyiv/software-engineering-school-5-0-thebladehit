@@ -3,23 +3,22 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SubscriptionType } from '@prisma/client';
 
-import { AbstractMailService } from './abstracts/mail.service.abstract';
-import { SendConfirmationMailDto } from './dto/send-confirmation-mail.dto';
-import { SendDailyForecastMailDto } from './dto/send-daily-forecast-mail.dto';
-import { SendHourlyForecastMailDto } from './dto/send-hourly-forecast-mail.dto';
-import { MailService } from './mail.serviceImpl';
+import { AbstractMailService } from '../../../src/modules/mail/abstracts/mail.service.abstract';
+import { SendConfirmationMailDto } from '../../../src/modules/mail/dto/send-confirmation-mail.dto';
+import { SendDailyForecastMailDto } from '../../../src/modules/mail/dto/send-daily-forecast-mail.dto';
+import { SendHourlyForecastMailDto } from '../../../src/modules/mail/dto/send-hourly-forecast-mail.dto';
+import { MailService } from '../../../src/modules/mail/mail.serviceImpl';
 
 const fakeAPIUrl = 'http://fake-api.com';
 
 describe('MailServiceImpl', () => {
   let service: AbstractMailService;
-  let mailerService: MailerService;
 
-  const mockMailerService = {
+  const mockedMailerService = {
     sendMail: jest.fn(),
   };
 
-  const mockConfigService = {
+  const mockedConfigService = {
     get: jest.fn((key: string) => {
       if (key === 'BACK_BASE_URL') return fakeAPIUrl;
       return null;
@@ -29,15 +28,27 @@ describe('MailServiceImpl', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        { provide: AbstractMailService, useClass: MailService },
-        { provide: MailerService, useValue: mockMailerService },
-        { provide: ConfigService, useValue: mockConfigService },
+        {
+          provide: AbstractMailService,
+          useClass: MailService,
+        },
+        {
+          provide: MailerService,
+          useValue: mockedMailerService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockedConfigService,
+        },
       ],
     }).compile();
 
     service = module.get(AbstractMailService);
-    mailerService = module.get(MailerService);
     jest.clearAllMocks();
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('sendSubscriptionConfirmation', () => {
@@ -51,7 +62,7 @@ describe('MailServiceImpl', () => {
 
       await service.sendSubscriptionConfirmation(dto);
 
-      expect(mailerService.sendMail).toHaveBeenCalledWith({
+      expect(mockedMailerService.sendMail).toHaveBeenCalledWith({
         to: dto.email,
         subject: 'Your subscription is created! Confirm it',
         template: './confirmation',
@@ -82,7 +93,7 @@ describe('MailServiceImpl', () => {
 
       await service.sendDailyForecast(dto);
 
-      expect(mailerService.sendMail).toHaveBeenCalledWith({
+      expect(mockedMailerService.sendMail).toHaveBeenCalledWith({
         to: dto.email,
         subject: `Daily Forecast for ${dto.city}`,
         template: './daily-forecast',
@@ -105,7 +116,7 @@ describe('MailServiceImpl', () => {
 
       await service.sendHourlyForecast(dto);
 
-      expect(mailerService.sendMail).toHaveBeenCalledWith({
+      expect(mockedMailerService.sendMail).toHaveBeenCalledWith({
         to: dto.email,
         subject: `Hourly Forecast for ${dto.city}`,
         template: './hourly-forecast',
