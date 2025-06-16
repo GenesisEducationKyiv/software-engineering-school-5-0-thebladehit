@@ -6,43 +6,53 @@ import {
 import { Test, TestingModule } from '@nestjs/testing';
 import { Subscription, SubscriptionType } from '@prisma/client';
 
-import { MailService } from '../mail/contracts/mail.service';
+import { CityService } from '../city/city.service';
+import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
 
-import { SubscriptionRepository } from './contracts/subscription.repository';
+import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { SubscriptionsService } from './subscriptions.service';
+import { SubscriptionWithUserAndCity } from './types/subscription-with-user-city';
 
 describe('SubscriptionsService', () => {
   let service: SubscriptionsService;
-  let repository: jest.Mocked<SubscriptionRepository>;
-  let mailService: jest.Mocked<MailService>;
+  let repository: jest.Mocked<AbstractSubscriptionRepository>;
+  let mailService: jest.Mocked<AbstractMailService>;
+  let cityService: jest.Mocked<CityService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SubscriptionsService,
         {
-          provide: SubscriptionRepository,
+          provide: AbstractSubscriptionRepository,
           useValue: {
-            findDuplicateSubscription: jest.fn(),
+            isDuplicateSubscription: jest.fn(),
             createSubscription: jest.fn(),
-            getSubscription: jest.fn(),
+            getSubscriptions: jest.fn(),
             findSubscriptionByToken: jest.fn(),
             confirmSubscription: jest.fn(),
             deleteSubscription: jest.fn(),
           },
         },
         {
-          provide: MailService,
+          provide: AbstractMailService,
           useValue: {
             sendSubscriptionConfirmation: jest.fn(),
+          },
+        },
+        {
+          provide: CityService,
+          useValue: {
+            getCityId: jest.fn(),
           },
         },
       ],
     }).compile();
 
     service = module.get(SubscriptionsService);
-    repository = module.get(SubscriptionRepository);
-    mailService = module.get(MailService);
+    repository = module.get(AbstractSubscriptionRepository);
+    mailService = module.get(AbstractMailService);
+    cityService = module.get(CityService);
   });
 
   it('should be defined', () => {
@@ -56,25 +66,24 @@ describe('SubscriptionsService', () => {
       frequency: SubscriptionType.DAILY,
     };
 
-    it('should throw ConflictException if subscription already exists', async () => {
-      repository.findDuplicateSubscription.mockResolvedValue({
-        id: '123',
-      } as Subscription);
+    it('should throw ConflictException if subscriptions already exists', async () => {
+      repository.isDuplicateSubscription.mockResolvedValue(true);
 
       await expect(service.createSubscription(dto)).rejects.toThrow(
         ConflictException
       );
     });
 
-    it('should create subscription and send confirmation email', async () => {
-      repository.findDuplicateSubscription.mockResolvedValue(null);
+    it('should create subscriptions and send confirmation email', async () => {
+      repository.isDuplicateSubscription.mockResolvedValue(false);
       repository.createSubscription.mockResolvedValue({
         id: 'token123',
       } as Subscription);
+      cityService.getCityId.mockResolvedValue('cityId');
 
       await service.createSubscription(dto);
 
-      expect(repository.createSubscription).toHaveBeenCalledWith(dto);
+      expect(repository.createSubscription).toHaveBeenCalledWith(dto, 'cityId');
       expect(mailService.sendSubscriptionConfirmation).toHaveBeenCalledWith({
         email: dto.email,
         city: dto.city,
@@ -87,7 +96,7 @@ describe('SubscriptionsService', () => {
   describe('confirmSubscription', () => {
     const token = 'fake-token';
 
-    it('should throw NotFoundException if subscription does not exist', async () => {
+    it('should throw NotFoundException if subscriptions does not exist', async () => {
       repository.findSubscriptionByToken.mockResolvedValue(null);
 
       await expect(service.confirmSubscription(token)).rejects.toThrow(
@@ -95,7 +104,7 @@ describe('SubscriptionsService', () => {
       );
     });
 
-    it('should throw BadRequestException if subscription already confirmed', async () => {
+    it('should throw BadRequestException if subscriptions already confirmed', async () => {
       repository.findSubscriptionByToken.mockResolvedValue({
         isConfirmed: true,
         id: token,
@@ -106,7 +115,7 @@ describe('SubscriptionsService', () => {
       );
     });
 
-    it('should confirm subscription', async () => {
+    it('should confirm subscriptions', async () => {
       repository.findSubscriptionByToken.mockResolvedValue({
         id: token,
         isConfirmed: false,
@@ -121,7 +130,7 @@ describe('SubscriptionsService', () => {
   describe('unsubscribeSubscription', () => {
     const token = 'fake-token';
 
-    it('should throw NotFoundException if subscription does not exist', async () => {
+    it('should throw NotFoundException if subscriptions does not exist', async () => {
       repository.findSubscriptionByToken.mockResolvedValue(null);
 
       await expect(service.confirmSubscription(token)).rejects.toThrow(
@@ -129,7 +138,7 @@ describe('SubscriptionsService', () => {
       );
     });
 
-    it('should delete subscription', async () => {
+    it('should delete subscriptions', async () => {
       repository.findSubscriptionByToken.mockResolvedValue({
         id: token,
         isConfirmed: false,
@@ -144,7 +153,7 @@ describe('SubscriptionsService', () => {
   describe('deleteSubscription', () => {
     const token = 'fake-token';
 
-    it('should delete subscription', async () => {
+    it('should delete subscriptions', async () => {
       repository.findSubscriptionByToken.mockResolvedValue({
         id: token,
         isConfirmed: false,
@@ -157,23 +166,29 @@ describe('SubscriptionsService', () => {
   });
 
   describe('getDailySubscribers', () => {
-    it('should call repository with SubscriptionType.DAILY and return daily subscription', async () => {
-      const mockSubscriptions: Subscription[] = [
+    it('should call repository with SubscriptionType.DAILY and return daily subscriptions', async () => {
+      const mockSubscriptions: SubscriptionWithUserAndCity[] = [
         {
           id: '1',
-          city: 'Kyiv',
+          city: {
+            name: 'city',
+          },
           type: SubscriptionType.DAILY,
           isConfirmed: true,
-          userId: 'u1',
+          user: {
+            email: 'email',
+          },
           createdAt: new Date(),
+          cityId: '1',
+          userId: '1',
         },
       ];
 
-      repository.getSubscription.mockResolvedValue(mockSubscriptions);
+      repository.getSubscriptions.mockResolvedValue(mockSubscriptions);
 
       const result = await service.getDailySubscribers();
 
-      expect(repository.getSubscription).toHaveBeenCalledWith(
+      expect(repository.getSubscriptions).toHaveBeenCalledWith(
         SubscriptionType.DAILY
       );
       expect(result).toEqual(mockSubscriptions);
@@ -181,23 +196,29 @@ describe('SubscriptionsService', () => {
   });
 
   describe('getHourlySubscribers', () => {
-    it('should call repository with SubscriptionType.HOURLY and return hourly subscription', async () => {
-      const mockSubscriptions: Subscription[] = [
+    it('should call repository with SubscriptionType.HOURLY and return hourly subscriptions', async () => {
+      const mockSubscriptions: SubscriptionWithUserAndCity[] = [
         {
           id: '1',
-          city: 'Kyiv',
-          type: SubscriptionType.HOURLY,
+          city: {
+            name: 'city',
+          },
+          type: SubscriptionType.DAILY,
           isConfirmed: true,
-          userId: 'u1',
+          user: {
+            email: 'email',
+          },
           createdAt: new Date(),
+          cityId: '1',
+          userId: '1',
         },
       ];
 
-      repository.getSubscription.mockResolvedValue(mockSubscriptions);
+      repository.getSubscriptions.mockResolvedValue(mockSubscriptions);
 
       const result = await service.getHourlySubscribers();
 
-      expect(repository.getSubscription).toHaveBeenCalledWith(
+      expect(repository.getSubscriptions).toHaveBeenCalledWith(
         SubscriptionType.HOURLY
       );
       expect(result).toEqual(mockSubscriptions);
