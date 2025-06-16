@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { City } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -8,11 +9,15 @@ import { AbstractCityRepository } from './abstracts/city.repository.abstract';
 export class CityRepository implements AbstractCityRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async isCityExists(name: string): Promise<boolean> {
-    const city = await this.prismaService.city.findUnique({
-      where: { name },
-      select: { id: true },
+  createCity(city: string): Promise<City> {
+    return this.prismaService.city.create({
+      data: { name: city },
     });
-    return Boolean(city);
+  }
+
+  getCity(name: string): Promise<City> {
+    return this.prismaService.city.findUnique({
+      where: { name },
+    });
   }
 }
