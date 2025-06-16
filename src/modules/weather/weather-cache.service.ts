@@ -13,12 +13,20 @@ export class WeatherCacheService {
   private readonly dailyForecastPrefix: string = 'daily:forecast';
   private readonly hourlyForecastPrefix: string = 'hourly:forecast';
   private readonly cacheTTL: number;
+  private readonly dailyForecastCacheTTL: number;
+  private readonly hourlyForecastCacheTTL: number;
 
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly configService: ConfigService
   ) {
     this.cacheTTL = this.configService.get<number>('WEATHER_CACHE_TTL');
+    this.dailyForecastCacheTTL = this.configService.get<number>(
+      'DAILY_FORECAST_CACHE_TTL'
+    );
+    this.hourlyForecastCacheTTL = this.configService.get<number>(
+      'HOURLY_FORECAST_CACHE_TTL'
+    );
   }
 
   public readonly weatherByCity = {
@@ -51,7 +59,7 @@ export class WeatherCacheService {
       this.cacheManager.set(
         this.getPrefix(this.dailyForecastPrefix, city),
         data,
-        1000 * 60 * 30
+        this.dailyForecastCacheTTL
       ),
     del: async (city: string): Promise<boolean> =>
       this.cacheManager.del(this.getPrefix(this.dailyForecastPrefix, city)),
@@ -69,7 +77,7 @@ export class WeatherCacheService {
       this.cacheManager.set(
         this.getPrefix(this.hourlyForecastPrefix, city),
         data,
-        1000 * 60 * 30
+        this.hourlyForecastCacheTTL
       ),
     del: async (city: string): Promise<boolean> =>
       this.cacheManager.del(this.getPrefix(this.hourlyForecastPrefix, city)),
