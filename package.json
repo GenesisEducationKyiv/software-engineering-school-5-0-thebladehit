@@ -19,7 +19,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prisma:migrate:deploy": "prisma migrate deploy --schema=./src/prisma/schema.prisma"
+    "prisma:migrate:deploy": "prisma migrate deploy --schema=./src/prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema=./src/prisma/schema.prisma"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
