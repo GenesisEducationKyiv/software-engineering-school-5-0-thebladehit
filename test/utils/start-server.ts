@@ -8,6 +8,7 @@ export const startServer = async (): Promise<void> => {
       ...process.env,
       NODE_ENV: 'test',
       PORT: '3000',
+      BACK_BASE_URL: 'http://localhost:3000',
     },
   });
   // eslint-disable-next-line no-constant-condition
