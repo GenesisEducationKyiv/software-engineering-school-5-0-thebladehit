@@ -18,7 +18,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "npm run build && playwright test -c test/e2e/playwright.config.ts",
     "prisma:migrate:deploy": "prisma migrate deploy --schema=./src/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema=./src/prisma/schema.prisma"
   },
@@ -48,6 +48,7 @@
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.4.17",
+    "@playwright/test": "^1.53.1",
     "@testcontainers/postgresql": "^11.0.3",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
@@ -88,7 +89,9 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "testPathIgnorePatterns": ["<rootDir>/dist/"],
+    "testPathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
