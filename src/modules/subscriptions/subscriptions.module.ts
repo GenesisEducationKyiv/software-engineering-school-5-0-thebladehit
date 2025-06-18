@@ -1,22 +1,22 @@
 import { Module } from '@nestjs/common';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { CityModule } from '../city/city.module';
 import { MailModule } from '../mail/mail.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
-import { SubscriptionRepository } from './contracts/subscription.repository';
-import { SubscriptionRepositoryImpl } from './subscription.repositoryImpl';
+import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
+import { SubscriptionRepository } from './subscription.repository';
 import { SubscriptionsController } from './subscriptions.controller';
 import { SubscriptionsService } from './subscriptions.service';
 
 @Module({
-  imports: [MailModule],
+  imports: [MailModule, PrismaModule, CityModule],
   controllers: [SubscriptionsController],
   providers: [
     SubscriptionsService,
-    PrismaService,
     {
-      provide: SubscriptionRepository,
-      useClass: SubscriptionRepositoryImpl,
+      provide: AbstractSubscriptionRepository,
+      useClass: SubscriptionRepository,
     },
   ],
   exports: [SubscriptionsService],
