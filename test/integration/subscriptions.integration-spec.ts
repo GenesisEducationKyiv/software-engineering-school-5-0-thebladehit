@@ -1,19 +1,16 @@
-import { execSync } from 'child_process';
-
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SubscriptionType } from '@prisma/client';
 import * as request from 'supertest';
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
 
 import { AppModule } from '../../src/modules/app.module';
 import { AbstractMailService } from '../../src/modules/mail/abstracts/mail.service.abstract';
 import { PrismaService } from '../../src/modules/prisma/prisma.service';
+import { setupDbContainer, stopDbContainer } from '../utils/setup-db';
 
 jest.setTimeout(30000);
 
 describe('Subscriptions endpoints (Integration tests)', () => {
-  let container: StartedTestContainer;
   let app: INestApplication;
   let prisma: PrismaService;
 
@@ -22,20 +19,7 @@ describe('Subscriptions endpoints (Integration tests)', () => {
   };
 
   beforeAll(async () => {
-    container = await new GenericContainer('postgres')
-      .withEnvironment({
-        POSTGRES_USER: 'test',
-        POSTGRES_PASSWORD: 'test',
-        POSTGRES_DB: 'test',
-      })
-      .withExposedPorts(5432)
-      .start();
-
-    process.env.DATABASE_URL = `postgresql://test:test@${container.getHost()}:${container.getMappedPort(5432)}/test`;
-
-    execSync('npm run prisma:migrate:deploy', {
-      env: process.env,
-    });
+    await setupDbContainer();
   });
 
   beforeEach(async () => {
@@ -62,7 +46,7 @@ describe('Subscriptions endpoints (Integration tests)', () => {
   afterAll(async () => {
     await app.close();
     await prisma.$disconnect();
-    await container.stop();
+    await stopDbContainer();
   });
 
   it('should be defined', () => {
