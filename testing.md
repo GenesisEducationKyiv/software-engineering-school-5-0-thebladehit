@@ -1,11 +1,13 @@
 # How to run tests
 
 ## Prerequisites
-1. Install dependencies:
+1. You must have installed `Node JS` and `Docker`,
+
+2. Install dependencies:
 ```bash
 npm i
 ```
-2. Generate Prisma Client:
+3. Generate Prisma Client:
 ```bash 
 npm run prisma:generate
 ```
@@ -18,4 +20,9 @@ npm run test
 ## Integration tests
 ```bash
 npm run test:integration
+```
+
+## E2E tests
+```bash
+npm run test:e2e
 ```
