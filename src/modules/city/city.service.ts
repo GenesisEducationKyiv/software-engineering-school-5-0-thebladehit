@@ -12,15 +12,16 @@ export class CityService {
   ) {}
 
   async getCityId(name: string): Promise<string> {
-    const cityInDB = await this.cityRepository.getCity(name);
+    const cityName = name.toLowerCase();
+    const cityInDB = await this.cityRepository.getCity(cityName);
     if (cityInDB) {
       return cityInDB.id;
     }
-    const isCityExists = await this.cityApiService.isCityExists(name);
+    const isCityExists = await this.cityApiService.isCityExists(cityName);
     if (!isCityExists) {
-      throw new NotFoundException(`City ${name} not found`);
+      throw new NotFoundException(`City ${cityName} not found`);
     }
-    const city = await this.cityRepository.createCity(name);
+    const city = await this.cityRepository.createCity(cityName);
     return city.id;
   }
 }
