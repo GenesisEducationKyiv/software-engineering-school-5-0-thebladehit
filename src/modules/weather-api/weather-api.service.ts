@@ -12,9 +12,9 @@ import { WeatherDailyForecastDto } from '../weather/dto/weather-daily-forecast.d
 import { WeatherHourlyForecastDto } from '../weather/dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from '../weather/dto/weather.dto';
 
-import { ForecastResponseDto } from './dto/forecast-api.dto';
-import { WeatherAPIDto } from './dto/weatherAPI.dto';
-import { WeatherAPIErrorDto } from './dto/weatherAPI.error.dto';
+import { ErrorResponse } from './dto/error-response';
+import { ForecastResponseDto } from './dto/forecast-response.dto';
+import { WeatherAPIDto } from './dto/weather-response.dto';
 
 // this service implementation use WeatherAPI.com
 @Injectable()
@@ -84,7 +84,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
       this.httpService.get<T>(url).pipe(
         map((response) => response.data),
         catchError((error) => {
-          const data = error?.response?.data as WeatherAPIErrorDto;
+          const data = error?.response?.data as ErrorResponse;
           if (data?.error?.code === 1006) {
             throw new NotFoundException();
           }
