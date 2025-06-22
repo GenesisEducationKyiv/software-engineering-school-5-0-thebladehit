@@ -27,7 +27,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
     private readonly httpService: HttpService
   ) {
     this.apiKey = this.configService.getOrThrow<string>('WEATHER_API_KEY');
-    this.baseURL = this.configService.get<string>('WEATHER_BASE_URL');
+    this.baseURL = this.configService.get<string>('WEATHER_API_BASE_URL');
   }
 
   async getWeather(city: string): Promise<WeatherResponseDto> {
