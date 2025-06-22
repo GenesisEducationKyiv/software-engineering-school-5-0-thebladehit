@@ -4,10 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
 
-import { CityApiService } from '../../../src/modules/weather-api/city-api.service';
+import { CityWeatherApiService } from '../../../src/modules/weather-api/city-weather-api.service';
 
-describe('CityApiService', () => {
-  let service: CityApiService;
+describe('CityWeatherApiService', () => {
+  let service: CityWeatherApiService;
 
   const mockedConfigService = {
     getOrThrow: jest.fn().mockReturnValue('test-api-key'),
@@ -21,7 +21,7 @@ describe('CityApiService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        CityApiService,
+        CityWeatherApiService,
         {
           provide: ConfigService,
           useValue: mockedConfigService,
@@ -33,7 +33,7 @@ describe('CityApiService', () => {
       ],
     }).compile();
 
-    service = module.get(CityApiService);
+    service = module.get(CityWeatherApiService);
     jest.clearAllMocks();
   });
 

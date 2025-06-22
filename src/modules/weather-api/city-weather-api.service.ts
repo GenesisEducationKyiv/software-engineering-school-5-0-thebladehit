@@ -10,10 +10,10 @@ import { catchError, firstValueFrom } from 'rxjs';
 
 import { AbstractCityApiService } from '../abstracts/city-api.abstract';
 
-import { WeatherAPIErrorDto } from './dto/weatherAPI.error.dto';
+import { ErrorResponse } from './dto/error-response';
 
 @Injectable()
-export class CityApiService implements AbstractCityApiService {
+export class CityWeatherApiService implements AbstractCityApiService {
   private readonly baseURL: string;
   private readonly apiKey: string;
 
@@ -30,7 +30,7 @@ export class CityApiService implements AbstractCityApiService {
     try {
       await firstValueFrom(
         this.httpService.get(url).pipe(
-          catchError((error: AxiosError<WeatherAPIErrorDto>) => {
+          catchError((error: AxiosError<ErrorResponse>) => {
             const errorCode = error.response?.data?.error?.code;
             if (errorCode === 1006) {
               throw new NotFoundException();
