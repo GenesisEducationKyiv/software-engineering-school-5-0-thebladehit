@@ -3,8 +3,10 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 
 import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
+import { OpenWeatherService } from '../open-weather/open-weather.service';
 import { WeatherAPIService } from '../weather-api/weather-api.service';
 
+import { WeatherApiChainService } from './weather-api-chain.service';
 import { WeatherCacheService } from './weather-cache.service';
 import { WeatherController } from './weather.controller';
 import { WeatherService } from './weather.service';
@@ -20,9 +22,20 @@ import { WeatherService } from './weather.service';
   providers: [
     WeatherService,
     WeatherCacheService,
+    WeatherAPIService,
+    OpenWeatherService,
     {
       provide: AbstractWeatherApiService,
-      useClass: WeatherAPIService,
+      useFactory: (
+        weatherApiService: WeatherAPIService,
+        openWeatherService: OpenWeatherService
+      ): AbstractWeatherApiService => {
+        return new WeatherApiChainService(
+          weatherApiService,
+          openWeatherService
+        );
+      },
+      inject: [WeatherAPIService, OpenWeatherService],
     },
   ],
   exports: [WeatherService],
