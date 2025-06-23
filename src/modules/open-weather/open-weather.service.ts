@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -21,6 +22,7 @@ import { CurrentWeatherDto } from './dto/weather-response.dto';
 export class OpenWeatherService implements AbstractWeatherApiChainService {
   private readonly baseURL: string;
   private readonly apiKey: string;
+  private readonly logger = new Logger(OpenWeatherService.name);
 
   private next?: AbstractWeatherApiChainService;
 
@@ -45,12 +47,14 @@ export class OpenWeatherService implements AbstractWeatherApiChainService {
       if (!weatherInfo) {
         throw new InternalServerErrorException();
       }
+      this.logger.log(response);
       return {
         temperature: response.main.temp,
         humidity: response.main.humidity,
         description: weatherInfo.description,
       };
     } catch (err) {
+      this.logger.error(err);
       if (!this.next) {
         throw err;
       }
@@ -71,6 +75,7 @@ export class OpenWeatherService implements AbstractWeatherApiChainService {
       if (!weatherInfo) {
         throw new InternalServerErrorException();
       }
+      this.logger.log(response);
       return {
         maxTemp: this.getMaxTemp(hourForecasts),
         minTemp: this.getMinTemp(hourForecasts),
@@ -82,6 +87,7 @@ export class OpenWeatherService implements AbstractWeatherApiChainService {
         sunset: new Date(response.city.sunset).toISOString(),
       };
     } catch (err) {
+      this.logger.error(err);
       if (!this.next) {
         throw err;
       }
@@ -102,6 +108,7 @@ export class OpenWeatherService implements AbstractWeatherApiChainService {
       if (!weatherInfo) {
         throw new InternalServerErrorException();
       }
+      this.logger.log(response);
       return {
         temp: hourForecast.main.temp,
         description: weatherInfo.description,
@@ -110,6 +117,7 @@ export class OpenWeatherService implements AbstractWeatherApiChainService {
         chance_of_rain: hourForecast.pop,
       };
     } catch (err) {
+      this.logger.error(err);
       if (!this.next) {
         throw err;
       }
