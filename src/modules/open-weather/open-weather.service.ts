@@ -152,7 +152,7 @@ export class OpenWeatherService implements AbstractWeatherApiChainService {
   }
 
   private getMinTemp(forecasts: CurrentWeatherDto[]): number {
-    let minTemp = 0;
+    let minTemp = Infinity;
     for (const forecast of forecasts) {
       const curTemp = forecast.main.temp;
       if (curTemp < minTemp) {
@@ -173,7 +173,7 @@ export class OpenWeatherService implements AbstractWeatherApiChainService {
   private getAvgHumidity(forecasts: CurrentWeatherDto[]): number {
     let avgHumidity = 0;
     for (const forecast of forecasts) {
-      avgHumidity += forecast.main.temp;
+      avgHumidity += forecast.main.humidity;
     }
     return avgHumidity / forecasts.length;
   }
