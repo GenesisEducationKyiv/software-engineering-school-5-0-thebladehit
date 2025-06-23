@@ -91,7 +91,7 @@ describe('OpenWeatherService', () => {
 
       expect(result.description).toBe('sunny');
       expect(result.maxTemp).toBe(25);
-      expect(result.minTemp).toBe(0); // initial minTemp is 0 in implementation
+      expect(result.minTemp).toBe(15);
     });
   });
 
