@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -21,6 +22,7 @@ import { WeatherAPIDto } from './dto/weather-response.dto';
 export class WeatherAPIService implements AbstractWeatherApiChainService {
   private readonly baseURL: string;
   private readonly apiKey: string;
+  private readonly logger = new Logger(WeatherAPIService.name);
 
   private next?: AbstractWeatherApiChainService;
 
@@ -40,12 +42,14 @@ export class WeatherAPIService implements AbstractWeatherApiChainService {
     try {
       const url = `${this.baseURL}/current.json?key=${this.apiKey}&q=${encodeURIComponent(city)}`;
       const response = await this.fetchWeatherDataFromAPI<WeatherAPIDto>(url);
+      this.logger.log(response);
       return {
         temperature: response.current.temp_c,
         humidity: response.current.humidity,
         description: response.current.condition.text,
       };
     } catch (err) {
+      this.logger.log(err);
       if (!this.next) {
         throw err;
       }
@@ -62,6 +66,7 @@ export class WeatherAPIService implements AbstractWeatherApiChainService {
       if (!dayForecast) {
         throw new InternalServerErrorException();
       }
+      this.logger.log(response);
       return {
         maxTemp: dayForecast.day.maxtemp_c,
         minTemp: dayForecast.day.mintemp_c,
@@ -73,6 +78,7 @@ export class WeatherAPIService implements AbstractWeatherApiChainService {
         sunset: dayForecast.astro.sunset,
       };
     } catch (err) {
+      this.logger.error(err);
       if (!this.next) {
         throw err;
       }
@@ -91,6 +97,7 @@ export class WeatherAPIService implements AbstractWeatherApiChainService {
         throw new InternalServerErrorException();
       }
       const hourForecast = dayForecast.hour[0];
+      this.logger.log(response);
       return {
         temp: hourForecast.temp_c,
         description: hourForecast.condition.text,
@@ -99,6 +106,7 @@ export class WeatherAPIService implements AbstractWeatherApiChainService {
         chance_of_rain: hourForecast.chance_of_rain,
       };
     } catch (err) {
+      this.logger.error(err);
       if (!this.next) {
         throw err;
       }
