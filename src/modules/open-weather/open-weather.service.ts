@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom, map } from 'rxjs';
 
-import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
+import { AbstractWeatherApiChainService } from '../abstracts/weather-api-chain.abstract';
 import { WeatherDailyForecastDto } from '../weather/dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from '../weather/dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from '../weather/dto/weather.dto';
@@ -18,9 +18,11 @@ import { CurrentWeatherDto } from './dto/weather-response.dto';
 
 // this service implementation use openweathermap.com
 @Injectable()
-export class OpenWeatherService implements AbstractWeatherApiService {
+export class OpenWeatherService implements AbstractWeatherApiChainService {
   private readonly baseURL: string;
   private readonly apiKey: string;
+
+  private next?: AbstractWeatherApiChainService;
 
   constructor(
     private readonly configService: ConfigService,
@@ -30,63 +32,89 @@ export class OpenWeatherService implements AbstractWeatherApiService {
     this.baseURL = this.configService.get<string>('OPEN_WEATHER_BASE_URL');
   }
 
+  setNext(next: AbstractWeatherApiChainService): void {
+    this.next = next;
+  }
+
   async getWeather(city: string): Promise<WeatherResponseDto> {
-    const url = `${this.baseURL}/weather?appid=${this.apiKey}&q=${encodeURIComponent(city)}`;
-    const response = await this.fetchWeatherDataFromAPI<CurrentWeatherDto>(url);
-    const weatherInfo = response.weather[0];
-    if (!weatherInfo) {
-      throw new InternalServerErrorException();
+    try {
+      const url = `${this.baseURL}/weather?appid=${this.apiKey}&q=${encodeURIComponent(city)}`;
+      const response =
+        await this.fetchWeatherDataFromAPI<CurrentWeatherDto>(url);
+      const weatherInfo = response.weather[0];
+      if (!weatherInfo) {
+        throw new InternalServerErrorException();
+      }
+      return {
+        temperature: response.main.temp,
+        humidity: response.main.humidity,
+        description: weatherInfo.description,
+      };
+    } catch (err) {
+      if (!this.next) {
+        throw err;
+      }
+      return this.next.getWeather(city);
     }
-    return {
-      temperature: response.main.temp,
-      humidity: response.main.humidity,
-      description: weatherInfo.description,
-    };
   }
 
   async getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
-    const url = `${this.baseURL}/forecast?appid=${this.apiKey}&q=${encodeURIComponent(city)}&units=metric&cnt=8`;
-    const response =
-      await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
-    const hourForecasts = response.list;
-    if (hourForecasts.length === 0) {
-      throw new InternalServerErrorException();
+    try {
+      const url = `${this.baseURL}/forecast?appid=${this.apiKey}&q=${encodeURIComponent(city)}&units=metric&cnt=8`;
+      const response =
+        await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
+      const hourForecasts = response.list;
+      if (hourForecasts.length === 0) {
+        throw new InternalServerErrorException();
+      }
+      const weatherInfo = hourForecasts[0].weather[0];
+      if (!weatherInfo) {
+        throw new InternalServerErrorException();
+      }
+      return {
+        maxTemp: this.getMaxTemp(hourForecasts),
+        minTemp: this.getMinTemp(hourForecasts),
+        avgTemp: this.getAvgTemp(hourForecasts),
+        avgHumidity: this.getAvgHumidity(hourForecasts),
+        chanceOfRain: this.getDailyChanceOfRain(hourForecasts),
+        description: weatherInfo.description,
+        sunrise: new Date(response.city.sunrise).toISOString(),
+        sunset: new Date(response.city.sunset).toISOString(),
+      };
+    } catch (err) {
+      if (!this.next) {
+        throw err;
+      }
+      return this.getDailyForecast(city);
     }
-    const weatherInfo = hourForecasts[0].weather[0];
-    if (!weatherInfo) {
-      throw new InternalServerErrorException();
-    }
-    return {
-      maxTemp: this.getMaxTemp(hourForecasts),
-      minTemp: this.getMinTemp(hourForecasts),
-      avgTemp: this.getAvgTemp(hourForecasts),
-      avgHumidity: this.getAvgHumidity(hourForecasts),
-      chanceOfRain: this.getDailyChanceOfRain(hourForecasts),
-      description: weatherInfo.description,
-      sunrise: new Date(response.city.sunrise).toISOString(),
-      sunset: new Date(response.city.sunset).toISOString(),
-    };
   }
 
   async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
-    const url = `${this.baseURL}/forecast?appid=${this.apiKey}&q=${encodeURIComponent(city)}&cnt=1&units=metric`;
-    const response =
-      await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
-    const hourForecast = response.list[0];
-    if (!hourForecast) {
-      throw new InternalServerErrorException();
+    try {
+      const url = `${this.baseURL}/forecast?appid=${this.apiKey}&q=${encodeURIComponent(city)}&cnt=1&units=metric`;
+      const response =
+        await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
+      const hourForecast = response.list[0];
+      if (!hourForecast) {
+        throw new InternalServerErrorException();
+      }
+      const weatherInfo = hourForecast.weather[0];
+      if (!weatherInfo) {
+        throw new InternalServerErrorException();
+      }
+      return {
+        temp: hourForecast.main.temp,
+        description: weatherInfo.description,
+        feelsLikeTemp: hourForecast.main.feels_like,
+        humidity: hourForecast.main.humidity,
+        chance_of_rain: hourForecast.pop,
+      };
+    } catch (err) {
+      if (!this.next) {
+        throw err;
+      }
+      return this.next.getHourlyForecast(city);
     }
-    const weatherInfo = hourForecast.weather[0];
-    if (!weatherInfo) {
-      throw new InternalServerErrorException();
-    }
-    return {
-      temp: hourForecast.main.temp,
-      description: weatherInfo.description,
-      feelsLikeTemp: hourForecast.main.feels_like,
-      humidity: hourForecast.main.humidity,
-      chance_of_rain: hourForecast.pop,
-    };
   }
 
   private async fetchWeatherDataFromAPI<T>(url: string): Promise<T> {
