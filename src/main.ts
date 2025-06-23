@@ -12,7 +12,11 @@ async function bootstrap(): Promise<void> {
   });
   const configService = app.get(ConfigService);
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    })
+  );
   await app.listen(configService.get('PORT') ?? 3000);
 }
 
