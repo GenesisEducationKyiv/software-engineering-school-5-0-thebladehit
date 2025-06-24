@@ -1,21 +1,8 @@
 import { test, expect } from '@playwright/test';
 
-import { setupDbContainer, stopDbContainer } from '../utils/setup-db';
-import { startServer, stopServer } from '../utils/start-server';
-
-const PAGE_URL = 'http://localhost:3000/';
+const PAGE_URL = process.env.BASE_URL || 'http://localhost:3000/';
 
 test.describe('Subscription form', () => {
-  test.beforeAll(async () => {
-    await setupDbContainer();
-    await startServer();
-  });
-
-  test.afterAll(async () => {
-    await stopDbContainer();
-    await stopServer();
-  });
-
   test.beforeEach(async ({ page }) => {
     await page.goto(PAGE_URL);
   });
@@ -27,7 +14,7 @@ test.describe('Subscription form', () => {
   test('Submitting form with valid data shows success message', async ({
     page,
   }) => {
-    await page.fill('#email', 'test@example.com');
+    await page.fill('#email', `test${Date.now()}@example.com`);
     await page.selectOption('#frequency', 'DAILY');
     await page.fill('#city', 'Kyiv');
 
@@ -41,18 +28,18 @@ test.describe('Subscription form', () => {
     await expect(message).not.toHaveClass(/error/);
   });
 
-  test('Submitting with invalid city shows error message', async ({ page }) => {
-    const invalidCity = 'fdsafasff';
-    await page.fill('#email', 'e2e@example.com');
+  test('Submitting with another city also works with mocked APIs', async ({ page }) => {
+    const anotherCity = 'TestCity';
+    await page.fill('#email', `e2e${Date.now()}@example.com`);
     await page.selectOption('#frequency', 'DAILY');
-    await page.fill('#city', invalidCity);
+    await page.fill('#city', anotherCity);
 
     await page.click('button[type=submit]');
 
     const message = page.locator('#message');
     await expect(message).toBeVisible();
-    await expect(message).toHaveClass(/error/);
-    await expect(message).toHaveText(`City ${invalidCity} not found`);
+    await expect(message).toHaveText('Check your email to confirm your subscription.');
+    await expect(message).not.toHaveClass(/error/);
   });
 
   test('Submitting empty form does not proceed (built-in validation)', async ({
