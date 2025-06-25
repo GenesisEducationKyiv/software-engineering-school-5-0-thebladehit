@@ -1,0 +1,71 @@
+version: '3.9'
+
+services:
+  api-e2e:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: api-e2e
+    user: root
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.test
+    environment:
+      DATABASE_URL: "postgresql://postgres:1111@postgres:5432/weather?schema=public"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+      mock-server:
+        condition: service_started
+    volumes:
+      - api_logs:/usr/src/app/logs
+    command: ["sh", "-c", "npx prisma generate --schema=src/prisma/schema.prisma && npx prisma migrate deploy --schema=src/prisma/schema.prisma && npm run start:dev"]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1111
+      POSTGRES_DB: weather_test
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog-e2e
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+  mock-server:
+    image: mockserver/mockserver:latest
+    container_name: mock-server-e2e
+    ports:
+      - "3001:1080"
+    environment:
+      - MOCKSERVER_WATCH_INITIALIZATION_JSON=true
+      - MOCKSERVER_PROPERTY_FILE=/config/mockserver.properties
+      - MOCKSERVER_INITIALIZATION_JSON_PATH=/config/initializerJson.json
+    volumes:
+      - ./test/mocks:/config
+
+volumes:
+  postgres_test_data:
+  api_logs:

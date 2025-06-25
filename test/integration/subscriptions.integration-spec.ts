@@ -1,33 +1,40 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SubscriptionType } from '@prisma/client';
+import { config as loadEnv } from 'dotenv';
 import * as request from 'supertest';
 
-import { AppModule } from '../../src/modules/app.module';
+loadEnv({ path: '.env.test' });
 import { AbstractMailService } from '../../src/modules/mail/abstracts/mail.service.abstract';
+import { CityOpenWeatherService } from '../../src/modules/open-weather/city-open-weather.service';
 import { PrismaService } from '../../src/modules/prisma/prisma.service';
-import { setupDbContainer, stopDbContainer } from '../utils/setup-db';
-
-jest.setTimeout(30000);
+import { SubscriptionsModule } from '../../src/modules/subscriptions/subscriptions.module';
+import { CityWeatherApiService } from '../../src/modules/weather-api/city-weather-api.service';
 
 describe('Subscriptions endpoints (Integration tests)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
+  let cityWeatherApiService: jest.Mocked<CityWeatherApiService>;
+  let cityOpenWeatherService: jest.Mocked<CityOpenWeatherService>;
 
   const mockedMailService = {
     sendSubscriptionConfirmation: jest.fn(),
   };
 
-  beforeAll(async () => {
-    await setupDbContainer();
-  });
-
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [SubscriptionsModule],
     })
       .overrideProvider(AbstractMailService)
       .useValue(mockedMailService)
+      .overrideProvider(CityWeatherApiService)
+      .useValue({
+        isCityExists: jest.fn(),
+      })
+      .overrideProvider(CityOpenWeatherService)
+      .useValue({
+        isCityExists: jest.fn(),
+      })
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -35,6 +42,8 @@ describe('Subscriptions endpoints (Integration tests)', () => {
     await app.init();
 
     prisma = app.get(PrismaService);
+    cityWeatherApiService = app.get(CityWeatherApiService);
+    cityOpenWeatherService = app.get(CityOpenWeatherService);
   });
 
   afterEach(async () => {
@@ -46,7 +55,6 @@ describe('Subscriptions endpoints (Integration tests)', () => {
   afterAll(async () => {
     await app.close();
     await prisma.$disconnect();
-    await stopDbContainer();
   });
 
   it('should be defined', () => {
@@ -55,6 +63,8 @@ describe('Subscriptions endpoints (Integration tests)', () => {
 
   describe('/subscribe (POST)', () => {
     it('should create subscription', async () => {
+      cityWeatherApiService.isCityExists.mockResolvedValue(true);
+
       const payload = {
         email: 'test@example.com',
         city: 'Kyiv',
@@ -70,6 +80,8 @@ describe('Subscriptions endpoints (Integration tests)', () => {
     });
 
     it('should return 409 status due to duplicate subscription', async () => {
+      cityWeatherApiService.isCityExists.mockResolvedValue(true);
+
       const payload = {
         email: 'test@example.com',
         city: 'Kyiv',
@@ -109,6 +121,9 @@ describe('Subscriptions endpoints (Integration tests)', () => {
     });
 
     it('should return BadRequest due to incorrect city ', async () => {
+      cityWeatherApiService.isCityExists.mockResolvedValue(false);
+      cityOpenWeatherService.isCityExists.mockResolvedValue(false);
+
       const payload = {
         email: 'test@example.com',
         city: 'fdsfdsfsfs',
@@ -126,6 +141,8 @@ describe('Subscriptions endpoints (Integration tests)', () => {
 
   describe('/confirm/:token (GET)', () => {
     it('should create and confirm subscription', async () => {
+      cityWeatherApiService.isCityExists.mockResolvedValue(true);
+
       const payload = {
         email: 'test@example.com',
         city: 'Kyiv',
@@ -175,6 +192,8 @@ describe('Subscriptions endpoints (Integration tests)', () => {
     });
 
     it('should return BadRequest if subscription is confirmed', async () => {
+      cityOpenWeatherService.isCityExists.mockResolvedValue(true);
+
       const payload = {
         email: 'test@example.com',
         city: 'Kyiv',
@@ -219,6 +238,8 @@ describe('Subscriptions endpoints (Integration tests)', () => {
 
   describe('/unsubscribe/:token (GET)', () => {
     it('should create and delete(unsubscribe) subscription', async () => {
+      cityOpenWeatherService.isCityExists.mockResolvedValue(true);
+
       const payload = {
         email: 'test@example.com',
         city: 'Kyiv',

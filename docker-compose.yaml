@@ -2,19 +2,21 @@ version: '3.9'
 
 services:
   api:
-    image: thebladehit/weather-api-light:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
     restart: always
-    container_name: api
     ports:
       - "3000:3000"
     env_file:
       - .env
+    command: ["sh", "-c", "npx prisma generate --schema=src/prisma/schema.prisma && npx prisma migrate deploy --schema=src/prisma/schema.prisma && npm run start:dev"]
     depends_on:
       - postgres
 
   postgres:
     image: postgres:latest
-    container_name: weather-api
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1111

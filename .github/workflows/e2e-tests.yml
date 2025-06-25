@@ -24,17 +24,6 @@ jobs:
 
     - name: Run Playwright tests
       run: npm run test:e2e
-      env:
-        SMTP_HOST: 'smtp.gmail.com'
-        SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-        WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-        OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
-        WEATHER_CACHE_TTL: 900000
-        DAILY_FORECAST_CACHE_TTL: 1800000
-        HOURLY_FORECAST_CACHE_TTL: 1800000
-        WEATHER_API_BASE_URL: ${{ secrets.WEATHER_API_BASE_URL }}
-        OPEN_WEATHER_BASE_URL: ${{ secrets.OPEN_WEATHER_BASE_URL }}
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}

@@ -20,6 +20,7 @@ import { WeatherModule } from './weather/weather.module';
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),
         SMTP_HOST: Joi.string().required(),
+        SMTP_PORT: Joi.number().required(),
         SMTP_USERNAME: Joi.string().required(),
         SMTP_PASSWORD: Joi.string().required(),
         WEATHER_API_KEY: Joi.string().required(),
