@@ -20,7 +20,7 @@ COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modul
 
 COPY --chown=node:node . .
 
-RUN npx prisma generate
+RUN npx prisma generate --schema=src/prisma/schema.prisma
 RUN npm run build
 
 RUN npm ci --only=production && npm cache clean --force
@@ -32,8 +32,7 @@ FROM node:22-alpine AS production
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 COPY --chown=node:node --from=build /usr/src/app/entrypoint.sh ./
-COPY --chown=node:node --from=build /usr/src/app/prisma ./prisma
+COPY --chown=node:node --from=build /usr/src/app/src/prisma ./src/prisma
 COPY --chown=node:node --from=build /usr/src/app/client ./client
-RUN chmod +x ./entrypoint.sh
 
-ENTRYPOINT ["./entrypoint.sh"]
+USER node

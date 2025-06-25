@@ -27,16 +27,3 @@ jobs:
 
       - name: Run integration tests
         run: npm run test:integration
-        env:
-          DATABASE_URL: 'no-data'
-          SMTP_HOST: 'no-data'
-          SMTP_USERNAME: 'no-data'
-          SMTP_PASSWORD: 'no-data'
-          BACK_BASE_URL: 'no-data'
-          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-          OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
-          WEATHER_CACHE_TTL: 900000
-          DAILY_FORECAST_CACHE_TTL: 1800000
-          HOURLY_FORECAST_CACHE_TTL: 1800000
-          WEATHER_API_BASE_URL: ${{ secrets.WEATHER_API_BASE_URL }}
-          OPEN_WEATHER_BASE_URL: ${{ secrets.OPEN_WEATHER_BASE_URL }}
