@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
 
+import { CityOpenWeatherProvider } from '../../src/modules/city/chain-providers/city-open-weather.provider';
+import { CityWeatherApiProvider } from '../../src/modules/city/chain-providers/city-weather-api.provider';
 import { CityApiChainService } from '../../src/modules/city/city-api-chain.service';
 import { CityOpenWeatherService } from '../../src/modules/open-weather/city-open-weather.service';
 import { CityWeatherApiService } from '../../src/modules/weather-api/city-weather-api.service';
@@ -24,21 +26,11 @@ describe('CityApiChainService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        CityApiChainService,
+        CityWeatherApiProvider,
+        CityOpenWeatherProvider,
         CityWeatherApiService,
         CityOpenWeatherService,
-        {
-          provide: CityApiChainService,
-          useFactory: (
-            cityWeatherApiService: CityWeatherApiService,
-            cityOpenWeatherService: CityOpenWeatherService
-          ): CityApiChainService => {
-            return new CityApiChainService(
-              cityWeatherApiService,
-              cityOpenWeatherService
-            );
-          },
-          inject: [CityWeatherApiService, CityOpenWeatherService],
-        },
         {
           provide: ConfigService,
           useValue: mockedConfigService,
@@ -98,12 +90,12 @@ describe('CityApiChainService', () => {
               error: { code: 1006 },
             },
           },
-        }))
+        })),
       );
       mockedHttpService.get.mockReturnValueOnce(
         throwError(() => ({
           response: { data: { cod: 404 } },
-        }))
+        })),
       );
 
       const result = await service.isCityExists('InvalidCity');
