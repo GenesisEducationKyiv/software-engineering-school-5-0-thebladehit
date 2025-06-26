@@ -1,35 +1,24 @@
-import { InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { AbstractCityApiChainService } from '../abstracts/city-api-chain.abstract';
+import { AbstractCityApiService } from '../../abstracts/city-api.abstract';
 
-export class CityApiChainService implements AbstractCityApiChainService {
-  protected next?: AbstractCityApiChainService;
+import { AbstractCityApiChainService } from './abstracts/city-api-chain.abstract';
+import { CityOpenWeatherProvider } from './chain-providers/city-open-weather.provider';
+import { CityWeatherApiProvider } from './chain-providers/city-weather-api.provider';
 
-  constructor(...cityApiProviders: AbstractCityApiChainService[]) {
-    this.setupChain(cityApiProviders);
-  }
+@Injectable()
+export class CityApiChainService implements AbstractCityApiService {
+  private readonly providerChain: AbstractCityApiChainService;
 
-  setNext(next: AbstractCityApiChainService): void {
-    this.next = next;
-  }
-
-  private setupChain(cityApiProviders: AbstractCityApiChainService[]): void {
-    if (cityApiProviders.length === 0) {
-      return;
-    }
-    let currentProvider = cityApiProviders[0];
-    this.setNext(currentProvider);
-    for (let i = 1; i < cityApiProviders.length; i++) {
-      const nextProvider = cityApiProviders[i];
-      currentProvider.setNext(nextProvider);
-      currentProvider = nextProvider;
-    }
+  constructor(
+    private readonly cityWeatherApiProvider: CityWeatherApiProvider,
+    private readonly cityOpenWeatherProvider: CityOpenWeatherProvider
+  ) {
+    this.providerChain = this.cityWeatherApiProvider;
+    this.providerChain.setNext(this.cityOpenWeatherProvider);
   }
 
   isCityExists(name: string): Promise<boolean> {
-    if (!this.next) {
-      throw new InternalServerErrorException('No providers');
-    }
-    return this.next.isCityExists(name);
+    return this.providerChain.isCityExists(name);
   }
 }

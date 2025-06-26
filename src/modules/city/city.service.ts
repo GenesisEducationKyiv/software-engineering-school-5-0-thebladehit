@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { AbstractCityApiService } from '../abstracts/city-api.abstract';
+import { AbstractCityApiService } from '../../abstracts/city-api.abstract';
 
 import { AbstractCityRepository } from './abstracts/city.repository.abstract';
 

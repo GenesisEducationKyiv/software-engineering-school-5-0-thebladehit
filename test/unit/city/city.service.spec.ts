@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AbstractCityApiService } from '../../../src/modules/abstracts/city-api.abstract';
+import { AbstractCityApiService } from '../../../src/abstracts/city-api.abstract';
 import { AbstractCityRepository } from '../../../src/modules/city/abstracts/city.repository.abstract';
 import { CityService } from '../../../src/modules/city/city.service';
 
