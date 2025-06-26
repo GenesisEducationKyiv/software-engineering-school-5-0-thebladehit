@@ -1,12 +1,20 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  INestApplication,
+  NotFoundException,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 
 import { AppModule } from '../../src/modules/app.module';
+import { OpenWeatherService } from '../../src/modules/open-weather/open-weather.service';
 import { PrismaService } from '../../src/modules/prisma/prisma.service';
+import { WeatherAPIService } from '../../src/modules/weather-api/weather-api.service';
 
 describe('Weather endpoints (Integration tests)', () => {
   let app: INestApplication;
+  let weatherApiService: jest.Mocked<WeatherAPIService>;
+  let openWeatherService: jest.Mocked<OpenWeatherService>;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -14,11 +22,22 @@ describe('Weather endpoints (Integration tests)', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideProvider(WeatherAPIService)
+      .useValue({
+        getWeather: jest.fn(),
+      })
+      .overrideProvider(OpenWeatherService)
+      .useValue({
+        getWeather: jest.fn(),
+      })
       .compile();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({}));
     await app.init();
+
+    weatherApiService = app.get(WeatherAPIService);
+    openWeatherService = app.get(OpenWeatherService);
   });
 
   afterAll(async () => {
@@ -31,6 +50,12 @@ describe('Weather endpoints (Integration tests)', () => {
 
   describe('/weather (GET)', () => {
     it('should return weather data for a valid city', async () => {
+      weatherApiService.getWeather.mockResolvedValue({
+        temperature: 10,
+        humidity: 10,
+        description: 'Sunny',
+      });
+
       const response = await request(app.getHttpServer())
         .get('/weather')
         .query({ city: 'Kyiv' })
@@ -51,9 +76,12 @@ describe('Weather endpoints (Integration tests)', () => {
   });
 
   it('should return 404 for invalid city value', async () => {
+    weatherApiService.getWeather.mockRejectedValue(new NotFoundException());
+    openWeatherService.getWeather.mockRejectedValue(new NotFoundException());
+
     const response = await request(app.getHttpServer())
       .get('/weather')
-      .query({ city: 'fffffdaf' })
+      .query({ city: 'invalidCity' })
       .expect(404);
 
     expect(response.body.message).toBeDefined();

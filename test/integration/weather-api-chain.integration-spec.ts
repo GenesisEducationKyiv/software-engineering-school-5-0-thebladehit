@@ -5,6 +5,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
 
 import { OpenWeatherService } from '../../src/modules/open-weather/open-weather.service';
+import { OpenWeatherProvider } from '../../src/modules/weather/chain-providers/open-weather.provider';
+import { WeatherApiProvider } from '../../src/modules/weather/chain-providers/weather-api.provider';
 import { WeatherApiChainService } from '../../src/modules/weather/weather-api-chain.service';
 import { WeatherAPIService } from '../../src/modules/weather-api/weather-api.service';
 
@@ -27,19 +29,9 @@ describe('WeatherApiChainService', () => {
       providers: [
         WeatherAPIService,
         OpenWeatherService,
-        {
-          provide: WeatherApiChainService,
-          useFactory: (
-            weatherApiService: WeatherAPIService,
-            openWeatherService: OpenWeatherService
-          ): WeatherApiChainService => {
-            return new WeatherApiChainService(
-              weatherApiService,
-              openWeatherService
-            );
-          },
-          inject: [WeatherAPIService, OpenWeatherService],
-        },
+        WeatherApiProvider,
+        OpenWeatherProvider,
+        WeatherApiChainService,
         {
           provide: ConfigService,
           useValue: mockedConfigService,

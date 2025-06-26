@@ -5,10 +5,10 @@ import { config as loadEnv } from 'dotenv';
 import * as request from 'supertest';
 
 loadEnv({ path: '.env.test' });
+import { AppModule } from '../../src/modules/app.module';
 import { AbstractMailService } from '../../src/modules/mail/abstracts/mail.service.abstract';
 import { CityOpenWeatherService } from '../../src/modules/open-weather/city-open-weather.service';
 import { PrismaService } from '../../src/modules/prisma/prisma.service';
-import { SubscriptionsModule } from '../../src/modules/subscriptions/subscriptions.module';
 import { CityWeatherApiService } from '../../src/modules/weather-api/city-weather-api.service';
 
 describe('Subscriptions endpoints (Integration tests)', () => {
@@ -23,7 +23,7 @@ describe('Subscriptions endpoints (Integration tests)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [SubscriptionsModule],
+      imports: [AppModule],
     })
       .overrideProvider(AbstractMailService)
       .useValue(mockedMailService)
