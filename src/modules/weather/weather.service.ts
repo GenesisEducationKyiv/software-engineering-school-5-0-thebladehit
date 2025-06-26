@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { AbstractWeatherApiService } from '../abstracts/weather-api.abstract';
+import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
 
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';

@@ -1,55 +1,57 @@
-import { InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { AbstractWeatherApiChainService } from '../abstracts/weather-api-chain.abstract';
+import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
 
+import { AbstractWeatherApiChainService } from './abstracts/weather-api-chain.abstract';
+import { OpenWeatherProvider } from './chain-providers/open-weather.provider';
+import { WeatherApiProvider } from './chain-providers/weather-api.provider';
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from './dto/weather.dto';
 
-export class WeatherApiChainService implements AbstractWeatherApiChainService {
-  protected next?: AbstractWeatherApiChainService;
+@Injectable()
+export class WeatherApiChainService implements AbstractWeatherApiService {
+  private readonly providerChain: AbstractWeatherApiChainService;
+  private readonly logger = new Logger(WeatherApiChainService.name);
 
-  constructor(...weatherApiProviders: AbstractWeatherApiChainService[]) {
-    this.setupChain(weatherApiProviders);
+  constructor(
+    private readonly weatherApiProvider: WeatherApiProvider,
+    private readonly openWeatherProvider: OpenWeatherProvider
+  ) {
+    this.providerChain = this.weatherApiProvider;
+    this.providerChain.setNext(this.openWeatherProvider);
   }
 
-  setNext(next: AbstractWeatherApiChainService): void {
-    this.next = next;
-  }
-
-  private setupChain(
-    weatherApiProviders: AbstractWeatherApiChainService[]
-  ): void {
-    if (weatherApiProviders.length === 0) {
-      return;
-    }
-    let currentProvider = weatherApiProviders[0];
-    this.setNext(currentProvider);
-    for (let i = 1; i < weatherApiProviders.length; i++) {
-      const nextProvider = weatherApiProviders[i];
-      currentProvider.setNext(nextProvider);
-      currentProvider = nextProvider;
+  async getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
+    try {
+      return await this.providerChain.getDailyForecast(city);
+    } catch (err) {
+      this.logger.error(
+        `Unable to get Daily Forecast for city: ${city} from all providers`
+      );
+      throw err;
     }
   }
 
-  getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
-    if (!this.next) {
-      throw new InternalServerErrorException('No providers');
+  async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
+    try {
+      return await this.providerChain.getHourlyForecast(city);
+    } catch (err) {
+      this.logger.error(
+        `Unable to get Hourly Forecast for city: ${city} from all providers`
+      );
+      throw err;
     }
-    return this.next.getDailyForecast(city);
   }
 
-  getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
-    if (!this.next) {
-      throw new InternalServerErrorException('No providers');
+  async getWeather(city: string): Promise<WeatherResponseDto> {
+    try {
+      return await this.providerChain.getWeather(city);
+    } catch (err) {
+      this.logger.error(
+        `Unable to get Weather for city: ${city} from all providers`
+      );
+      throw err;
     }
-    return this.next.getHourlyForecast(city);
-  }
-
-  getWeather(city: string): Promise<WeatherResponseDto> {
-    if (!this.next) {
-      throw new InternalServerErrorException('No providers');
-    }
-    return this.next.getWeather(city);
   }
 }

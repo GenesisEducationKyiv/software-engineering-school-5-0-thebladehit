@@ -9,17 +9,15 @@ import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
 import { catchError, firstValueFrom } from 'rxjs';
 
-import { AbstractCityApiChainService } from '../abstracts/city-api-chain.abstract';
+import { AbstractCityApiService } from '../../abstracts/city-api.abstract';
 
 import { ErrorResponse } from './dto/error-response';
 
 @Injectable()
-export class CityWeatherApiService implements AbstractCityApiChainService {
+export class CityWeatherApiService implements AbstractCityApiService {
   private readonly baseURL: string;
   private readonly apiKey: string;
   private readonly logger = new Logger(CityWeatherApiService.name);
-
-  protected next?: AbstractCityApiChainService;
 
   constructor(
     private readonly configService: ConfigService,
@@ -29,16 +27,13 @@ export class CityWeatherApiService implements AbstractCityApiChainService {
     this.baseURL = this.configService.get<string>('WEATHER_API_BASE_URL');
   }
 
-  setNext(next: AbstractCityApiChainService): void {
-    this.next = next;
-  }
-
   async isCityExists(name: string): Promise<boolean> {
     const url = `${this.baseURL}/current.json?key=${this.apiKey}&q=${encodeURIComponent(name)}`;
     try {
-      await firstValueFrom(
+      const result = await firstValueFrom(
         this.httpService.get(url).pipe(
           catchError((error: AxiosError<ErrorResponse>) => {
+            this.logger.error(error.response?.data);
             const errorCode = error.response?.data?.error?.code;
             if (errorCode === 1006) {
               throw new NotFoundException();
@@ -47,13 +42,9 @@ export class CityWeatherApiService implements AbstractCityApiChainService {
           })
         )
       );
-      this.logger.log(`City exists ${name}`);
+      this.logger.log(result.data);
       return true;
     } catch (err) {
-      this.logger.error(err);
-      if (this.next) {
-        return this.next.isCityExists(name);
-      }
       if (err instanceof NotFoundException) {
         return false;
       }

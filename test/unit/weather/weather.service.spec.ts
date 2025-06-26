@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AbstractWeatherApiService } from '../../../src/modules/abstracts/weather-api.abstract';
+import { AbstractWeatherApiService } from '../../../src/abstracts/weather-api.abstract';
 import { WeatherDailyForecastDto } from '../../../src/modules/weather/dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from '../../../src/modules/weather/dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from '../../../src/modules/weather/dto/weather.dto';
