@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
+import { MetricsService } from '../metrics/metrics.service';
 
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
@@ -15,6 +16,7 @@ import { WeatherCacheService } from './weather-cache.service';
 export class WeatherService {
   constructor(
     private readonly weatherApiService: AbstractWeatherApiService,
+    private readonly metricService: MetricsService,
     private readonly cache: WeatherCacheService
   ) {}
 
@@ -22,9 +24,11 @@ export class WeatherService {
     try {
       const cachedData = await this.cache.weatherByCity.get(city);
       if (cachedData) {
+        this.metricService.incFromCache();
         return cachedData;
       }
       const weatherData = await this.weatherApiService.getWeather(city);
+      this.metricService.incFromApi();
       await this.cache.weatherByCity.set(city, weatherData);
       return weatherData;
     } catch (error) {
@@ -38,9 +42,11 @@ export class WeatherService {
   async getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
     const cachedData = await this.cache.dailyForecastByCity.get(city);
     if (cachedData) {
+      this.metricService.incFromCache();
       return cachedData;
     }
     const forecastData = await this.weatherApiService.getDailyForecast(city);
+    this.metricService.incFromApi();
     await this.cache.dailyForecastByCity.set(city, forecastData);
     return forecastData;
   }
@@ -48,9 +54,11 @@ export class WeatherService {
   async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
     const cachedData = await this.cache.hourlyForecastByCity.get(city);
     if (cachedData) {
+      this.metricService.incFromCache();
       return cachedData;
     }
     const forecastData = await this.weatherApiService.getHourlyForecast(city);
+    this.metricService.incFromApi();
     await this.cache.hourlyForecastByCity.set(city, forecastData);
     return forecastData;
   }

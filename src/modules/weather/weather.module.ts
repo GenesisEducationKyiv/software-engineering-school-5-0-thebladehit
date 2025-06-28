@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
+import { MetricsModule } from '../metrics/metrics.module';
 import { OpenWeatherModule } from '../open-weather/open-weather.module';
 import { WeatherApiModule } from '../weather-api/weather-api.module';
 
@@ -28,6 +29,7 @@ import { WeatherService } from './weather.service';
     }),
     WeatherApiModule,
     OpenWeatherModule,
+    MetricsModule,
   ],
   controllers: [WeatherController],
   providers: [
