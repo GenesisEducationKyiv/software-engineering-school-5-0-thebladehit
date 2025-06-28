@@ -86,4 +86,26 @@ describe('Weather endpoints (Integration tests)', () => {
 
     expect(response.body.message).toBeDefined();
   });
+
+  it('should return data from cache if in cache', async () => {
+    weatherApiService.getWeather.mockResolvedValueOnce({
+      temperature: 10,
+      humidity: 10,
+      description: 'Sunny',
+    });
+
+    await request(app.getHttpServer())
+      .get('/weather')
+      .query({ city: 'Kyiv' })
+      .expect(200);
+
+    const response = await request(app.getHttpServer())
+      .get('/weather')
+      .query({ city: 'Kyiv' })
+      .expect(200);
+
+    expect(response.body).toHaveProperty('temperature');
+    expect(response.body).toHaveProperty('humidity');
+    expect(response.body).toHaveProperty('description');
+  });
 });

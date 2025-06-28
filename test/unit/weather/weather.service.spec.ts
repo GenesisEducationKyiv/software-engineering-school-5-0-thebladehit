@@ -2,6 +2,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AbstractWeatherApiService } from '../../../src/abstracts/weather-api.abstract';
+import { MetricsService } from '../../../src/modules/metrics/metrics.service';
 import { WeatherDailyForecastDto } from '../../../src/modules/weather/dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from '../../../src/modules/weather/dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from '../../../src/modules/weather/dto/weather.dto';
@@ -33,6 +34,11 @@ describe('WeatherService', () => {
     },
   };
 
+  const mockedMetricService = {
+    incFromCache: jest.fn(),
+    incFromApi: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -44,6 +50,10 @@ describe('WeatherService', () => {
         {
           provide: WeatherCacheService,
           useValue: mockedWeatherCacheService,
+        },
+        {
+          provide: MetricsService,
+          useValue: mockedMetricService,
         },
       ],
     }).compile();
@@ -80,6 +90,7 @@ describe('WeatherService', () => {
         city,
         mockWeather
       );
+      expect(mockedMetricService.incFromApi).toHaveBeenCalled();
     });
 
     it('should return weather from cache', async () => {
@@ -98,6 +109,7 @@ describe('WeatherService', () => {
       expect(mockedWeatherCacheService.weatherByCity.get).toHaveBeenCalledWith(
         city
       );
+      expect(mockedMetricService.incFromCache).toHaveBeenCalled();
     });
 
     it('should throw NotFoundException if city is invalid', async () => {
@@ -151,6 +163,7 @@ describe('WeatherService', () => {
       expect(
         mockedWeatherCacheService.dailyForecastByCity.set
       ).toHaveBeenCalledWith(city, mockWeather);
+      expect(mockedMetricService.incFromApi).toHaveBeenCalled();
     });
 
     it('should return forecast from cache', async () => {
@@ -164,6 +177,7 @@ describe('WeatherService', () => {
       expect(
         mockedWeatherCacheService.dailyForecastByCity.get
       ).toHaveBeenCalledWith(city);
+      expect(mockedMetricService.incFromCache).toHaveBeenCalled();
     });
   });
 
@@ -195,6 +209,7 @@ describe('WeatherService', () => {
       expect(
         mockedWeatherCacheService.hourlyForecastByCity.set
       ).toHaveBeenCalledWith(city, mockWeather);
+      expect(mockedMetricService.incFromApi).toHaveBeenCalled();
     });
 
     it('should return forecast from cache', async () => {
@@ -208,6 +223,7 @@ describe('WeatherService', () => {
       expect(
         mockedWeatherCacheService.hourlyForecastByCity.get
       ).toHaveBeenCalledWith(city);
+      expect(mockedMetricService.incFromCache).toHaveBeenCalled();
     });
   });
 });
