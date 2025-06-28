@@ -14,6 +14,7 @@ services:
     command: ["sh", "-c", "npx prisma generate --schema=src/prisma/schema.prisma && npx prisma migrate deploy --schema=src/prisma/schema.prisma && npm run start:dev"]
     depends_on:
       - postgres
+      - redis
 
   postgres:
     image: postgres:latest
@@ -27,5 +28,13 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: always
 
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
+  redis_data:

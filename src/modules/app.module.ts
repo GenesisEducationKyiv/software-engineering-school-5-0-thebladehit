@@ -23,6 +23,8 @@ import { WeatherModule } from './weather/weather.module';
         SMTP_PORT: Joi.number().required(),
         SMTP_USERNAME: Joi.string().required(),
         SMTP_PASSWORD: Joi.string().required(),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
         WEATHER_API_KEY: Joi.string().required(),
         WEATHER_API_BASE_URL: Joi.string().required(),
         OPEN_WEATHER_API_KEY: Joi.string().required(),
