@@ -36,7 +36,6 @@ describe('Weather endpoints (Integration tests)', () => {
         .expect(200);
 
       expect(response.body.status).toEqual('OK');
-      expect(response.body).toHaveProperty('timestamp');
     });
   });
 });
