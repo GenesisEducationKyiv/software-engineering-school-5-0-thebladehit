@@ -1,5 +1,7 @@
+import { createKeyv } from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
 import { OpenWeatherModule } from '../open-weather/open-weather.module';
@@ -13,7 +15,20 @@ import { WeatherController } from './weather.controller';
 import { WeatherService } from './weather.service';
 
 @Module({
-  imports: [CacheModule.register(), WeatherApiModule, OpenWeatherModule],
+  imports: [
+    CacheModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        stores: [
+          createKeyv(
+            `${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`
+          ),
+        ],
+      }),
+      inject: [ConfigService],
+    }),
+    WeatherApiModule,
+    OpenWeatherModule,
+  ],
   controllers: [WeatherController],
   providers: [
     WeatherService,

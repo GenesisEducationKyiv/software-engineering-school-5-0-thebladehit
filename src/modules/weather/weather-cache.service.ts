@@ -84,6 +84,6 @@ export class WeatherCacheService {
   };
 
   private getPrefix(prefix: string, city: string): string {
-    return `${prefix}${city}`;
+    return `${prefix}:${city}`;
   }
 }
