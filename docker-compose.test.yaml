@@ -21,6 +21,8 @@ services:
         condition: service_started
       mock-server:
         condition: service_started
+      redis:
+        condition: service_healthy
     volumes:
       - api_logs:/usr/src/app/logs
     command: ["sh", "-c", "npx prisma generate --schema=src/prisma/schema.prisma && npx prisma migrate deploy --schema=src/prisma/schema.prisma && npm run start:dev"]
@@ -47,6 +49,19 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis
+    container_name: redis-test
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   mailhog:
     image: mailhog/mailhog:latest
     container_name: mailhog-e2e
@@ -69,3 +84,4 @@ services:
 volumes:
   postgres_test_data:
   api_logs:
+  redis_data:
