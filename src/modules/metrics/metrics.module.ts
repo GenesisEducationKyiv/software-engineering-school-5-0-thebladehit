@@ -4,7 +4,7 @@ import {
   PrometheusModule,
 } from '@willsoto/nestjs-prometheus';
 
-import { DATA_FROM_API, DATA_FROM_REDIS_CACHE } from './constance/metric-names';
+import { DATA_FROM_API, DATA_FROM_REDIS_CACHE } from './constants/metric-names';
 import { MetricsService } from './metrics.service';
 
 @Module({
