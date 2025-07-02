@@ -41,6 +41,7 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 ![H-L-A](./assets/ssddrawio.png)
 
 ## 4. Detailed component design
+![Arch](./assets/architecture.png)
 
 ### 4.1 Weather Module
 #### Responsibilities:
