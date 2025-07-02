@@ -51,18 +51,27 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 - Caches weather data for time interval
 
 #### Includes:
-- WeatherController
-- WeatherService
-- ExternalWeatherAPIService
+- `WeatherController`
+- `WeatherService`
+- `WeatherApiChainService`
+- `WeatherCacheService`
+
+Chain providers:
+- `BaseWeatherProvider`
+- `OpenWeatherProvider`
+- `WeatherApiProvider`
 
 #### Communications
 - `WeatherService` - is used by `WeatherController` for getting current weather.
 - `WeatherService` - is used by `WeatherNotificationService` for getting weather forecast. 
-- `ExternalWeatherAPIService` is used by `WeatherService` for getting weather data from external API.
+- `<I>AbstractWeatherApiService` is used by `WeatherService` for getting weather data from external APIs.
+- `WeatherApiChainService` is provided as `<I>AbstractWeatherApiService` by DI.
+- `WeatherCacheService` is used by `WeatherService`.
+- `OpenWeatherProvider` and `WeatherApiProvider` are used by `WeatherApiChainService`.
 
 #### Using:
-- External WeatherAPI.com API
-- In-memory cache
+- External WeatherAPI.com and OpenWeather.com API via providers
+- Nest Cache Manage
 
 #### Endpoint:
 - `GET /weather?city=`
@@ -76,14 +85,17 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 - Provides subscriptions information
 
 #### Includes
-- Subscription Service
-- Subscription Controller
-- Subscription Repository
+- `SubscriptionService`
+- `SubscriptionController`
+- `SubscriptionRepository`
 
 #### Communications
 - `SubscriptionService` is used by `SubscriptionController` for: create, confirm, unsubscribe subscription.
 - `SubscriptionService` is used by `WeatherNotificationService` for getting subscribers.
 - `SubscriptionRepository` is used by `SubscriptionService` for db access.
+
+### Using
+- `CityService`
 
 #### Endpoints:
 - `POST /subscribe`
@@ -109,24 +121,53 @@ It is a system that allows people to subscribe to hourly or daily weather foreca
 - `daily-forecast.hbs`
 - `hourly-forecast.hbs`
 
-### 4.4 Jobs Module
+### 4.4 Notifier Module
 #### Responsibilities:
 - Sends `DAILY/HOURLY` forecast for users
 
 #### Includes
-- WeatherNotificationService
+- `WeatherNotificationService`
 
 #### Using:
 - @nestjs/schedule for cron job
 
+### 4.4 City Module
+#### Responsibilities:
+- Provides cities id if it exists 
+- Crates cities in db
+
+#### Includes
+- `CityService`
+- `CityRepository`
+- `CityApiChainService`
+
+Chain providers:
+- `BaseCityProvider`
+- `CityOpenWeatherProvider`
+- `CityWeatherApiProvider`
+
+#### Communications
+- `CityService` is used by `SubscriptionService` for: get city ids.
+- `CityRepository` is used by `CityService` for db access.
+- `CityApiChainService` is provided as `<I>AbstractCityApiChainService` by DI.
+- `<I>AbstractCityApiChainService` is used by `CityService` for getting cities data from external APIs.
+- `CityOpenWeatherProvider` and `CityWeatherApiProvider` are used by `CityWeatherApiProvider`.
+
+### Using
+- External WeatherAPI.com and OpenWeather.com API via providers
+
 ## 5. Database schema
 ### Subscription
 - `id`: UUID
-- `city`: TEXT
+- `city_id`: TEXT
 - `type`: `ENUM TYPE` (`DAILY`/`HOULY`)
 - `isConfirmed`: BOOLEAN
 - `user_id`: TEXT
 - `created_at`: TIMESTAMP
+
+### City
+- `id`: UUID
+- `name`: TEXT
 
 ### User
 - `id`: UUID
