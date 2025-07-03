@@ -2,7 +2,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AbstractWeatherApiService } from '../../../src/abstracts/weather-api.abstract';
-import { MetricsService } from '../../../src/modules/metrics/metrics.service';
+import { AbstractMetricsService } from '../../../src/modules/metrics/abstracts/metrics.service.abstract';
 import { WeatherDailyForecastDto } from '../../../src/modules/weather/dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from '../../../src/modules/weather/dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from '../../../src/modules/weather/dto/weather.dto';
@@ -52,7 +52,7 @@ describe('WeatherService', () => {
           useValue: mockedWeatherCacheService,
         },
         {
-          provide: MetricsService,
+          provide: AbstractMetricsService,
           useValue: mockedMetricService,
         },
       ],
