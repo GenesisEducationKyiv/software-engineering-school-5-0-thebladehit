@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
-import { MetricsService } from '../metrics/metrics.service';
+import { AbstractMetricsService } from '../metrics/abstracts/metrics.service.abstract';
 
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
@@ -16,7 +16,7 @@ import { WeatherCacheService } from './weather-cache.service';
 export class WeatherService {
   constructor(
     private readonly weatherApiService: AbstractWeatherApiService,
-    private readonly metricService: MetricsService,
+    private readonly metricService: AbstractMetricsService,
     private readonly cache: WeatherCacheService
   ) {}
 
