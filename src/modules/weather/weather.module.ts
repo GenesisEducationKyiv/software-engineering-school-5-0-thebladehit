@@ -8,6 +8,7 @@ import { MetricsModule } from '../metrics/metrics.module';
 import { OpenWeatherModule } from '../open-weather/open-weather.module';
 import { WeatherApiModule } from '../weather-api/weather-api.module';
 
+import { AbstractWeatherCacheService } from './abstracts/weather-cache.service.abstract';
 import { OpenWeatherProvider } from './chain-providers/open-weather.provider';
 import { WeatherApiProvider } from './chain-providers/weather-api.provider';
 import { WeatherApiChainService } from './weather-api-chain.service';
@@ -34,12 +35,15 @@ import { WeatherService } from './weather.service';
   controllers: [WeatherController],
   providers: [
     WeatherService,
-    WeatherCacheService,
     WeatherApiProvider,
     OpenWeatherProvider,
     {
       provide: AbstractWeatherApiService,
       useClass: WeatherApiChainService,
+    },
+    {
+      provide: AbstractWeatherCacheService,
+      useClass: WeatherCacheService,
     },
   ],
   exports: [WeatherService],

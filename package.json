@@ -23,6 +23,7 @@
     "pretest:e2e": "docker compose -f docker-compose.test.yaml up -d && ./wait.sh",
     "test:e2e": "playwright test -c test/e2e/playwright.config.ts",
     "posttest:e2e": "docker compose -f docker-compose.test.yaml down -v",
+    "test:arch": "npx depcruise -c test/architecture/.dependency-cruiser.js src",
     "prisma:migrate:deploy": "prisma migrate deploy --schema=./src/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema=./src/prisma/schema.prisma"
   },
@@ -67,6 +68,7 @@
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
+    "dependency-cruiser": "^16.10.3",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-eslint-comments": "^3.2.0",

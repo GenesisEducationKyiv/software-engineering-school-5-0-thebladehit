@@ -26,3 +26,8 @@ npm run test:integration
 ```bash
 npm run test:e2e
 ```
+
+## Architecture tests
+```bash
+npm run test:arch
+```

@@ -5,19 +5,19 @@ import {
 } from '@nestjs/common';
 
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
-import { MetricsService } from '../metrics/metrics.service';
+import { AbstractMetricsService } from '../metrics/abstracts/metrics.service.abstract';
 
+import { AbstractWeatherCacheService } from './abstracts/weather-cache.service.abstract';
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from './dto/weather.dto';
-import { WeatherCacheService } from './weather-cache.service';
 
 @Injectable()
 export class WeatherService {
   constructor(
     private readonly weatherApiService: AbstractWeatherApiService,
-    private readonly metricService: MetricsService,
-    private readonly cache: WeatherCacheService
+    private readonly metricService: AbstractMetricsService,
+    private readonly cache: AbstractWeatherCacheService
   ) {}
 
   async getWeather(city: string): Promise<WeatherResponseDto> {

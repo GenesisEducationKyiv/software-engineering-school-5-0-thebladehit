@@ -3,12 +3,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
 
+import { AbstractWeatherCacheService } from './abstracts/weather-cache.service.abstract';
 import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from './dto/weather.dto';
 
 @Injectable()
-export class WeatherCacheService {
+export class WeatherCacheService implements AbstractWeatherCacheService {
   private readonly currentWeatherPrefix: string = 'weather';
   private readonly dailyForecastPrefix: string = 'daily:forecast';
   private readonly hourlyForecastPrefix: string = 'hourly:forecast';

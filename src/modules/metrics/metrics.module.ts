@@ -4,6 +4,7 @@ import {
   PrometheusModule,
 } from '@willsoto/nestjs-prometheus';
 
+import { AbstractMetricsService } from './abstracts/metrics.service.abstract';
 import { DATA_FROM_API, DATA_FROM_REDIS_CACHE } from './constants/metric-names';
 import { MetricsService } from './metrics.service';
 
@@ -16,7 +17,10 @@ import { MetricsService } from './metrics.service';
     }),
   ],
   providers: [
-    MetricsService,
+    {
+      provide: AbstractMetricsService,
+      useClass: MetricsService,
+    },
     makeCounterProvider({
       name: DATA_FROM_REDIS_CACHE,
       help: 'Data gotten from redis cache',
@@ -26,6 +30,6 @@ import { MetricsService } from './metrics.service';
       help: 'Data gotten from external api',
     }),
   ],
-  exports: [MetricsService],
+  exports: [AbstractMetricsService],
 })
 export class MetricsModule {}

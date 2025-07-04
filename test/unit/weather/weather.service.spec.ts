@@ -2,11 +2,11 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AbstractWeatherApiService } from '../../../src/abstracts/weather-api.abstract';
-import { MetricsService } from '../../../src/modules/metrics/metrics.service';
+import { AbstractMetricsService } from '../../../src/modules/metrics/abstracts/metrics.service.abstract';
+import { AbstractWeatherCacheService } from '../../../src/modules/weather/abstracts/weather-cache.service.abstract';
 import { WeatherDailyForecastDto } from '../../../src/modules/weather/dto/weather-daily-forecast.dto';
 import { WeatherHourlyForecastDto } from '../../../src/modules/weather/dto/weather-hourly-forecast.dto';
 import { WeatherResponseDto } from '../../../src/modules/weather/dto/weather.dto';
-import { WeatherCacheService } from '../../../src/modules/weather/weather-cache.service';
 import { WeatherService } from '../../../src/modules/weather/weather.service';
 
 describe('WeatherService', () => {
@@ -48,11 +48,11 @@ describe('WeatherService', () => {
           useValue: mockedWeatherApiService,
         },
         {
-          provide: WeatherCacheService,
+          provide: AbstractWeatherCacheService,
           useValue: mockedWeatherCacheService,
         },
         {
-          provide: MetricsService,
+          provide: AbstractMetricsService,
           useValue: mockedMetricService,
         },
       ],
