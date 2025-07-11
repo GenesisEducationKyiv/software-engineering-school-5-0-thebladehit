@@ -65,4 +65,11 @@ module.exports = {
     'promise/param-names': 'error',
     'promise/no-nesting': 'warn',
   },
+  settings: {
+    'import/resolver': {
+      typescript: {
+        project: './tsconfig.json',
+      },
+    },
+  },
 };
