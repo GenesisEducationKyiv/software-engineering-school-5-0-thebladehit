@@ -4,6 +4,10 @@
   "monorepo": true,
   "root": "apps/subscriptions",
   "sourceRoot": "apps/subscriptions/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true
+  },
   "projects": {
     "weather": {
       "type": "application",

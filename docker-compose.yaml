@@ -1,32 +1,46 @@
 version: '3.9'
 
 services:
-  api:
+  weather:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./apps/weather/Dockerfile
       target: development
     restart: always
     ports:
-      - "3000:3000"
+      - "3001:3001"
     env_file:
-      - .env
-    command: ["sh", "-c", "npx prisma generate --schema=src/prisma/schema.prisma && npx prisma migrate deploy --schema=src/prisma/schema.prisma && npm run start:dev"]
+      - ./apps/weather/.env
+    command: sh -c "NODE_PATH=/usr/src/app/apps/weather/node_modules npm run start weather"
     depends_on:
-      - postgres
       - redis
 
-  postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1111
-      POSTGRES_DB: weather
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
+#  api:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#      target: development
+#    restart: always
+#    ports:
+#      - "3000:3000"
+#    env_file:
+#      - .env
+#    command: ["sh", "-c", "npx prisma generate --schema=src/prisma/schema.prisma && npx prisma migrate deploy --schema=src/prisma/schema.prisma && npm run start:dev"]
+#    depends_on:
+#      - postgres
+#      - redis
+
+#  postgres:
+#    image: postgres:latest
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: 1111
+#      POSTGRES_DB: weather
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    restart: always
 
   redis:
     image: redis
