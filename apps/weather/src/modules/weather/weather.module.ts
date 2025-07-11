@@ -31,6 +31,7 @@ import { WeatherService } from './weather.service';
         WEATHER_CACHE_TTL: Joi.number().integer().required(),
         DAILY_FORECAST_CACHE_TTL: Joi.number().integer().required(),
         HOURLY_FORECAST_CACHE_TTL: Joi.number().integer().required(),
+        PORT: Joi.number().required(),
       }),
     }),
     CacheModule.registerAsync({
