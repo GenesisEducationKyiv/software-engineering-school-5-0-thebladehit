@@ -1,3 +1,4 @@
+import { CreateSubscriptionDto } from '@app/common/types';
 import {
   Controller,
   Get,
@@ -8,7 +9,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 
-import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { SubscriptionsService } from './subscriptions.service';
 
 @Controller()

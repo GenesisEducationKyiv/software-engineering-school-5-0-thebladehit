@@ -1,13 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import {
+  WeatherDailyForecastDto,
+  WeatherHourlyForecastDto,
+  WeatherResponseDto,
+} from '@app/common/types';
+
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
 
 import { AbstractWeatherApiChainService } from './abstracts/weather-api-chain.abstract';
 import { OpenWeatherProvider } from './chain-providers/open-weather.provider';
 import { WeatherApiProvider } from './chain-providers/weather-api.provider';
-import { WeatherDailyForecastDto } from './dto/weather-daily-forecast.dto';
-import { WeatherHourlyForecastDto } from './dto/weather-hourly-forecast.dto';
-import { WeatherResponseDto } from './dto/weather-response.dto';
 
 @Injectable()
 export class WeatherApiChainService implements AbstractWeatherApiService {

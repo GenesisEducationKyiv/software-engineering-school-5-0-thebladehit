@@ -1,14 +1,14 @@
+import {
+  SendConfirmationMailDto,
+  SendDailyForecastMailDto,
+  SendHourlyForecastMailDto,
+} from '@app/common/types';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 
-import { AbstractNotificationService } from './abstracts/notification.service.abstract';
-import { SendConfirmationMailDto } from './dto/send-confirmation-mail.dto';
-import { SendDailyForecastMailDto } from './dto/send-daily-forecast-mail.dto';
-import { SendHourlyForecastMailDto } from './dto/send-hourly-forecast-mail.dto';
-
 @Injectable()
-export class MailService implements AbstractNotificationService {
+export class MailService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService
