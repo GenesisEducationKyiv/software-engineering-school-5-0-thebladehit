@@ -1,10 +1,10 @@
+import { CreateSubscriptionDto } from '@app/common/types';
 import { Injectable } from '@nestjs/common';
 import { Subscription, SubscriptionType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
-import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { SubscriptionWithUserAndCity } from './types/subscription-with-user-city';
 
 @Injectable()

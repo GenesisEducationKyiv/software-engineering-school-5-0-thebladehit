@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 
-import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
+import { AbstractNotificationsService } from '../notifications/abstracts/notifications.abstract';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
-import { WeatherService } from '../weather/weather.service';
+import { AbstractWeatherService } from '../weather/abstracts/weather.abstract';
 
 @Injectable()
 export class WeatherNotification {
   constructor(
-    private readonly weatherService: WeatherService,
+    private readonly weatherService: AbstractWeatherService,
     private readonly subscriptionService: SubscriptionsService,
-    private readonly mailService: AbstractMailService
+    private readonly notificationsService: AbstractNotificationsService
   ) {}
 
   @Cron('30 8 * * *')
@@ -23,7 +23,7 @@ export class WeatherNotification {
         subscription.city.name
       );
       promises.push(
-        this.mailService.sendDailyForecast({
+        this.notificationsService.sendDailyForecast({
           email: subscription['user'].email,
           city: subscription.city.name,
           ...forecast,
@@ -43,7 +43,7 @@ export class WeatherNotification {
         subscription.city.name
       );
       promises.push(
-        this.mailService.sendHourlyForecast({
+        this.notificationsService.sendHourlyForecast({
           email: subscription['user'].email,
           city: subscription.city.name,
           ...forecast,
