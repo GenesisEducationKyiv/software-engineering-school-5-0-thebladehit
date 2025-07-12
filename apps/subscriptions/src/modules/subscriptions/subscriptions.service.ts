@@ -1,3 +1,4 @@
+import { CreateSubscriptionDto } from '@app/common/types';
 import {
   BadRequestException,
   ConflictException,
@@ -7,10 +8,9 @@ import {
 import { Subscription, SubscriptionType } from '@prisma/client';
 
 import { CityService } from '../city/city.service';
-import { AbstractMailService } from '../mail/abstracts/mail.service.abstract';
+import { AbstractNotificationsService } from '../notifications/abstracts/notifications.abstract';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
-import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { SubscriptionWithUserAndCity } from './types/subscription-with-user-city';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class SubscriptionsService {
   constructor(
     private readonly subscriptionRepository: AbstractSubscriptionRepository,
     private readonly cityService: CityService,
-    private readonly mailService: AbstractMailService
+    private readonly notificationsService: AbstractNotificationsService
   ) {}
 
   getDailySubscribers(): Promise<SubscriptionWithUserAndCity[]> {
@@ -42,7 +42,7 @@ export class SubscriptionsService {
       dto,
       cityId
     );
-    await this.mailService.sendSubscriptionConfirmation({
+    await this.notificationsService.sendSubscriptionConfirmation({
       email: dto.email,
       token: subscription.id,
       city: dto.city,

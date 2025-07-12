@@ -1,6 +1,6 @@
+import { CreateSubscriptionDto } from '@app/common/types';
 import { Subscription, SubscriptionType } from '@prisma/client';
 
-import { CreateSubscriptionDto } from '../dto/create-subscription.dto';
 import { SubscriptionWithUserAndCity } from '../types/subscription-with-user-city';
 
 export abstract class AbstractSubscriptionRepository {

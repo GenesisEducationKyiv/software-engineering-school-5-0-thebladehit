@@ -1,6 +1,8 @@
-import { WeatherDailyForecastDto } from '../dto/weather-daily-forecast.dto';
-import { WeatherHourlyForecastDto } from '../dto/weather-hourly-forecast.dto';
-import { WeatherResponseDto } from '../dto/weather-response.dto';
+import {
+  WeatherDailyForecastDto,
+  WeatherHourlyForecastDto,
+  WeatherResponseDto,
+} from '@app/common/types';
 
 export abstract class AbstractWeatherCacheService {
   abstract weatherByCity: {

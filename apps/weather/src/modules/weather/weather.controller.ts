@@ -6,8 +6,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { CityQueryDto } from './dto/city-query.dto';
-import { WeatherResponseDto } from './dto/weather-response.dto';
+import { CityQueryDto, WeatherResponseDto } from '@app/common/types';
+
 import { WeatherService } from './weather.service';
 
 @Controller('weather')
