@@ -25,7 +25,19 @@ services:
       - "3002:3002"
     env_file:
       - ./apps/notifications/.env
-    command: npm run start -- notifications
+    command: npm run start notifications
+
+  subscriptions:
+    build:
+      context: .
+      dockerfile: ./apps/subscriptions/Dockerfile
+      target: development
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./apps/subscriptions/.env
+    command: npm run start subscriptions
 
 #  api:
 #    build:
@@ -42,17 +54,17 @@ services:
 #      - postgres
 #      - redis
 
-#  postgres:
-#    image: postgres:latest
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: 1111
-#      POSTGRES_DB: weather
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
-#    restart: always
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1111
+      POSTGRES_DB: weather
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
 
   redis:
     image: redis
