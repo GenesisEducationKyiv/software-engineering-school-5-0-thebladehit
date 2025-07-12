@@ -8,10 +8,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom, map } from 'rxjs';
 
+import {
+  WeatherDailyForecastDto,
+  WeatherHourlyForecastDto,
+  WeatherResponseDto,
+} from '@app/common/types';
+
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
-import { WeatherDailyForecastDto } from '../weather/dto/weather-daily-forecast.dto';
-import { WeatherHourlyForecastDto } from '../weather/dto/weather-hourly-forecast.dto';
-import { WeatherResponseDto } from '../weather/dto/weather-response.dto';
 
 import { ErrorResponse } from './dto/error-response';
 import { ForecastResponseDto } from './dto/forecast-response.dto';
