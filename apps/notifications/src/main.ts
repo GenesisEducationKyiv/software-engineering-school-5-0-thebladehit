@@ -1,9 +1,8 @@
+import { winstonConfig } from '@app/common/logger';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
-
-import { winstonConfig } from '@app/common/logger';
 
 import { NotificationModule } from './notification.module';
 
