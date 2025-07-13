@@ -16,9 +16,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Generate prisma client
-      run: npx prisma generate --schema=./src/prisma/schema.prisma
-
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
