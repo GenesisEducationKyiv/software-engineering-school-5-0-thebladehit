@@ -5,7 +5,9 @@ import { SubscriptionWithUserAndCity } from '../types/subscription-with-user-cit
 
 export abstract class AbstractSubscriptionRepository {
   abstract getSubscriptions(
-    type: SubscriptionType
+    type: SubscriptionType,
+    batchSize: number,
+    lastId?: string
   ): Promise<SubscriptionWithUserAndCity[]>;
   abstract findSubscriptionByToken(token: string): Promise<Subscription>;
   abstract isDuplicateSubscription(
