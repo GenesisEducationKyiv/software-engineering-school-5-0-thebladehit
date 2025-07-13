@@ -4,10 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 
-import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(SubscriptionsModule, {
+  const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(winstonConfig),
   });
   const configService = app.get(ConfigService);
