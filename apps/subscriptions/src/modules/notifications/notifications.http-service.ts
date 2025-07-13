@@ -54,10 +54,6 @@ export class NotificationsHttpService implements AbstractNotificationsService {
         if (err.code === 'ECONNREFUSED') {
           this.logger.error('Notification service in not reachable');
         }
-        const status = err.response?.status;
-        if (status === 400) {
-          throw new HttpException(err.response?.data, status);
-        }
       }
       throw new InternalServerErrorException();
     }
