@@ -6,7 +6,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import * as Joi from 'joi';
 
-import { AbstractNotificationService } from './abstracts/notification.service.abstract';
 import { MailService } from './mail.service';
 import { NotificationController } from './notification.controller';
 
@@ -40,7 +39,7 @@ import { NotificationController } from './notification.controller';
           from: '"No Reply" <noreply@example.com>',
         },
         template: {
-          dir: join(__dirname, '..', '..', 'mail', 'templates'),
+          dir: join(__dirname, 'mail', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
@@ -50,12 +49,6 @@ import { NotificationController } from './notification.controller';
     }),
   ],
   controllers: [NotificationController],
-  providers: [
-    {
-      provide: AbstractNotificationService,
-      useClass: MailService,
-    },
-  ],
-  exports: [AbstractNotificationService],
+  providers: [MailService],
 })
 export class NotificationModule {}
