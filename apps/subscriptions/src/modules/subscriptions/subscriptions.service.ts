@@ -21,13 +21,25 @@ export class SubscriptionsService {
     private readonly notificationsService: AbstractNotificationsService
   ) {}
 
-  getDailySubscribers(): Promise<SubscriptionWithUserAndCity[]> {
-    return this.subscriptionRepository.getSubscriptions(SubscriptionType.DAILY);
+  getDailySubscribers(
+    batchSize: number,
+    lastId?: string
+  ): Promise<SubscriptionWithUserAndCity[]> {
+    return this.subscriptionRepository.getSubscriptions(
+      SubscriptionType.DAILY,
+      batchSize,
+      lastId
+    );
   }
 
-  getHourlySubscribers(): Promise<SubscriptionWithUserAndCity[]> {
+  getHourlySubscribers(
+    batchSize: number,
+    lastId?: string
+  ): Promise<SubscriptionWithUserAndCity[]> {
     return this.subscriptionRepository.getSubscriptions(
-      SubscriptionType.HOURLY
+      SubscriptionType.HOURLY,
+      batchSize,
+      lastId
     );
   }
 
