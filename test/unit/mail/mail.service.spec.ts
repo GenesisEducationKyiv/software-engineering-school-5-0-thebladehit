@@ -68,8 +68,8 @@ describe('MailServiceImpl', () => {
         context: {
           city: dto.city,
           frequency: dto.frequency,
-          urlConfirm: `${fakeAPIUrl}/api/confirm/abc123`,
-          urlUnsubscribe: `${fakeAPIUrl}/api/unsubscribe/abc123`,
+          urlConfirm: `${fakeAPIUrl}/subscriptions/confirm/abc123`,
+          urlUnsubscribe: `${fakeAPIUrl}/subscriptions/unsubscribe/abc123`,
         },
       });
     });
