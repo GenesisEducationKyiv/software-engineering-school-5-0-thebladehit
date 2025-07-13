@@ -4,6 +4,7 @@ import * as Joi from 'joi';
 
 import { CityModule } from '../city/city.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { NotifierModule } from '../notifier/notifier.module';
 import { PrismaModule } from '../prisma/prisma.module';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
@@ -24,11 +25,13 @@ import { SubscriptionsService } from './subscriptions.service';
         NOTIFICATIONS_URL: Joi.string().required(),
         WEATHER_URL: Joi.string().required(),
         PORT: Joi.number().required(),
+        BATCH_SIZE: Joi.number().required(),
       }),
     }),
     PrismaModule,
     CityModule,
     NotificationsModule,
+    NotifierModule,
   ],
   controllers: [SubscriptionsController],
   providers: [

@@ -8,3 +8,7 @@ export interface WeatherDailyForecastDto {
   sunrise: string;
   sunset: string;
 }
+
+export interface CitiesDailyForecastDto {
+  [city: string]: WeatherDailyForecastDto;
+}

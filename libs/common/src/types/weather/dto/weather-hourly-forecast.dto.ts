@@ -5,3 +5,7 @@ export interface WeatherHourlyForecastDto {
   humidity: number;
   chance_of_rain: number;
 }
+
+export interface CitiesHourlyForecastDto {
+  [city: string]: WeatherHourlyForecastDto;
+}

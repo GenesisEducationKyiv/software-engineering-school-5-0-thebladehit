@@ -12,9 +12,16 @@ export class SubscriptionRepository implements AbstractSubscriptionRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   getSubscriptions(
-    type: SubscriptionType
+    type: SubscriptionType,
+    batchSize: number,
+    lastId?: string
   ): Promise<SubscriptionWithUserAndCity[]> {
     return this.prismaService.subscription.findMany({
+      take: batchSize,
+      ...(lastId && {
+        cursor: { id: lastId },
+        skip: 1,
+      }),
       where: {
         type,
         isConfirmed: true,
