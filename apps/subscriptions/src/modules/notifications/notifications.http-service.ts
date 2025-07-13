@@ -5,7 +5,6 @@ import {
 } from '@app/common/types';
 import { HttpService } from '@nestjs/axios';
 import {
-  HttpException,
   Injectable,
   InternalServerErrorException,
   Logger,
