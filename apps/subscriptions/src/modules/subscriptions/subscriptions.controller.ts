@@ -1,4 +1,4 @@
-import { CreateSubscriptionDto } from '@app/common/types';
+import { CreateSubscriptionDto, StatusResponseDto } from '@app/common/types';
 import {
   Controller,
   Get,
@@ -24,7 +24,7 @@ export class SubscriptionsController {
   @Get('/confirm/:token')
   async confirmSubscription(
     @Param('token') token: string
-  ): Promise<{ status: string; message: string }> {
+  ): Promise<StatusResponseDto> {
     await this.subscriptionsService.confirmSubscription(token);
     return { status: 'ok', message: 'Subscription confirmed successfully' };
   }
@@ -32,7 +32,7 @@ export class SubscriptionsController {
   @Get('/unsubscribe/:token')
   async unsubscribeSubscription(
     @Param('token') token: string
-  ): Promise<{ status: string; message: string }> {
+  ): Promise<StatusResponseDto> {
     await this.subscriptionsService.unsubscribeSubscription(token);
     return { status: 'ok', message: 'Unsubscribed successfully' };
   }
