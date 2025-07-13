@@ -47,6 +47,23 @@ services:
       weather:
         condition: service_started
 
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+      target: development
+    restart: always
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./apps/gateway/.env
+    command: npm run start gateway
+    depends_on:
+      subscriptions:
+        condition: service_started
+      weather:
+        condition: service_started
+
   postgres:
     image: postgres:latest
     environment:
