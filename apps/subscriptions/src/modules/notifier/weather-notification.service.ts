@@ -30,7 +30,7 @@ export class WeatherNotification {
         this.batchSize,
         lastId
       );
-      if (subscriptions.length === 0) break;
+      if (!subscriptions || subscriptions.length === 0) break;
       lastId = subscriptions[subscriptions.length - 1].id;
 
       const uniqueCities = this.getUniqueCities(subscriptions);
@@ -61,7 +61,7 @@ export class WeatherNotification {
         this.batchSize,
         lastId
       );
-      if (subscriptions.length === 0) break;
+      if (!subscriptions || subscriptions.length === 0) break;
       lastId = subscriptions[subscriptions.length - 1].id;
 
       const uniqueCities = this.getUniqueCities(subscriptions);
