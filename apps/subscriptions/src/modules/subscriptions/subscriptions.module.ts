@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
 import { CityModule } from '../city/city.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { PrismaModule } from '../prisma/prisma.module';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
@@ -12,19 +13,22 @@ import { SubscriptionsService } from './subscriptions.service';
 
 @Module({
   imports: [
-    PrismaModule,
-    CityModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),
-        WEATHER_API_KEY: Joi.number().required(),
+        WEATHER_API_KEY: Joi.string().required(),
         WEATHER_API_BASE_URL: Joi.string().required(),
         OPEN_WEATHER_API_KEY: Joi.string().required(),
         OPEN_WEATHER_BASE_URL: Joi.string().required(),
+        NOTIFICATIONS_URL: Joi.string().required(),
+        WEATHER_URL: Joi.string().required(),
         PORT: Joi.number().required(),
       }),
     }),
+    PrismaModule,
+    CityModule,
+    NotificationsModule,
   ],
   controllers: [SubscriptionsController],
   providers: [
