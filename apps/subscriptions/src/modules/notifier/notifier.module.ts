@@ -10,7 +10,7 @@ import { WeatherNotification } from './weather-notification.service';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    forwardRef(() => SubscriptionsModule),
+    SubscriptionsModule,
     NotificationsModule,
     WeatherModule,
   ],
