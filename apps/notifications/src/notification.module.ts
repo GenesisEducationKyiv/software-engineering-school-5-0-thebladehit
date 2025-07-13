@@ -1,5 +1,6 @@
 import { join } from 'path';
 
+import { HealthModule } from '@app/common/health';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -47,6 +48,7 @@ import { NotificationController } from './notification.controller';
         },
       }),
     }),
+    HealthModule,
   ],
   controllers: [NotificationController],
   providers: [MailService],

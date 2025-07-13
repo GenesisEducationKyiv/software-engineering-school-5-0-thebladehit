@@ -1,6 +1,7 @@
-import { SubscriptionType } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsString, MinLength } from 'class-validator';
+
+import { SubscriptionType } from '@app/common/types';
 
 export class CreateSubscriptionDto {
   @IsEmail()
@@ -12,6 +13,6 @@ export class CreateSubscriptionDto {
   @Transform(({ value }) => value.toLowerCase())
   city: string;
 
-  @IsEnum(SubscriptionType)
+  @IsIn(['DAILY', 'HOURLY'])
   frequency: SubscriptionType;
 }
