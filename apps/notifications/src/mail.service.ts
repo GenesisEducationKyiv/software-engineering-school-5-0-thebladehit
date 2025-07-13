@@ -20,8 +20,8 @@ export class MailService {
     city,
     frequency,
   }: SendConfirmationMailDto): Promise<void> {
-    const urlConfirm = `${this.configService.get('BACK_BASE_URL')}/api/confirm/${token}`;
-    const urlUnsubscribe = `${this.configService.get('BACK_BASE_URL')}/api/unsubscribe/${token}`;
+    const urlConfirm = `${this.configService.get('BACK_BASE_URL')}/subscription/confirm/${token}`;
+    const urlUnsubscribe = `${this.configService.get('BACK_BASE_URL')}/subscription/unsubscribe/${token}`;
 
     await this.mailerService.sendMail({
       to: email,
