@@ -10,7 +10,9 @@ services:
     ports:
       - "3001:3001"
     env_file:
-      - ./apps/weather/.env
+      - .env.test
+    environment:
+      PORT: 3001
     command: npm run start weather
     depends_on:
       redis:
@@ -27,7 +29,9 @@ services:
     ports:
       - "3002:3002"
     env_file:
-      - ./apps/notifications/.env
+      - .env.test
+    environment:
+      PORT: 3002
     command: npm run start notifications
     depends_on:
       mailhog:
@@ -42,7 +46,10 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ./apps/subscriptions/.env
+      - .env.test
+    environment:
+      PORT: 3000
+      DATABASE_URL: "postgresql://postgres:1111@postgres:5432/weather?schema=public"
     command: [ "sh", "-c", "npx prisma generate --schema=apps/subscriptions/src/prisma && npx prisma migrate deploy --schema=apps/subscriptions/src/prisma && npm run start subscriptions" ]
     depends_on:
       postgres:
@@ -63,7 +70,9 @@ services:
     ports:
       - "3003:3003"
     env_file:
-      - ./apps/gateway/.env
+      - .env.test
+    environment:
+      PORT: 3003
     command: npm run start gateway
     depends_on:
       subscriptions:
