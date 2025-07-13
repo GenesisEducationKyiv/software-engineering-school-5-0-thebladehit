@@ -1,3 +1,4 @@
+import { HealthModule } from '@app/common/health';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -32,6 +33,7 @@ import { SubscriptionsService } from './subscriptions.service';
     CityModule,
     NotificationsModule,
     NotifierModule,
+    HealthModule,
   ],
   controllers: [SubscriptionsController],
   providers: [
