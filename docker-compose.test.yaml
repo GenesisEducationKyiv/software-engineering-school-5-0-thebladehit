@@ -1,36 +1,75 @@
 version: '3.9'
 
 services:
-  api-e2e:
+  weather:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./apps/weather/Dockerfile
       target: development
-    container_name: api-e2e
-    user: root
+    restart: always
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./apps/weather/.env
+    command: npm run start weather
+    depends_on:
+      redis:
+        condition: service_healthy
+      mock-server:
+        condition: service_started
+
+  notifications:
+    build:
+      context: .
+      dockerfile: ./apps/notifications/Dockerfile
+      target: development
+    restart: always
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./apps/notifications/.env
+    command: npm run start notifications
+    depends_on:
+      mailhog:
+        condition: service_started
+
+  subscriptions:
+    build:
+      context: .
+      dockerfile: ./apps/subscriptions/Dockerfile
+      target: development
+    restart: always
     ports:
       - "3000:3000"
     env_file:
-      - .env.test
-    environment:
-      DATABASE_URL: "postgresql://postgres:1111@postgres:5432/weather?schema=public"
+      - ./apps/subscriptions/.env
+    command: [ "sh", "-c", "npx prisma generate --schema=apps/subscriptions/src/prisma && npx prisma migrate deploy --schema=apps/subscriptions/src/prisma && npm run start subscriptions" ]
     depends_on:
       postgres:
         condition: service_healthy
-      mailhog:
+      notifications:
+        condition: service_started
+      weather:
         condition: service_started
       mock-server:
         condition: service_started
-      redis:
-        condition: service_healthy
-    volumes:
-      - api_logs:/usr/src/app/logs
-    command: ["sh", "-c", "npx prisma generate --schema=src/prisma/schema.prisma && npx prisma migrate deploy --schema=src/prisma/schema.prisma && npm run start:dev"]
-    healthcheck:
-      test: ["CMD", "sh", "-c", "curl -f http://localhost:3000/api/health || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 12
+
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+      target: development
+    restart: always
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./apps/gateway/.env
+    command: npm run start gateway
+    depends_on:
+      subscriptions:
+        condition: service_started
+      weather:
+        condition: service_started
 
   postgres:
     image: postgres:latest
@@ -73,7 +112,7 @@ services:
     image: mockserver/mockserver:latest
     container_name: mock-server-e2e
     ports:
-      - "3001:1080"
+      - "3004:1080"
     environment:
       - MOCKSERVER_WATCH_INITIALIZATION_JSON=true
       - MOCKSERVER_PROPERTY_FILE=/config/mockserver.properties
