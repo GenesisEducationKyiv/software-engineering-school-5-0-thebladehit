@@ -271,7 +271,7 @@ describe('WeatherApiChainService', () => {
         description: 'Partly cloudy',
         feelsLikeTemp: 16,
         humidity: 65,
-        chance_of_rain: 10,
+        chanceOfRain: 10,
       });
       expect(mockedHttpService.get).toHaveBeenCalledTimes(1);
     });
@@ -311,7 +311,7 @@ describe('WeatherApiChainService', () => {
         description: 'cloudy',
         feelsLikeTemp: 18,
         humidity: 55,
-        chance_of_rain: 0.1,
+        chanceOfRain: 0.1,
       });
       expect(mockedHttpService.get).toHaveBeenCalledTimes(2);
     });

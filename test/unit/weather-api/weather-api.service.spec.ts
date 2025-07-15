@@ -149,7 +149,7 @@ describe('WeatherAPIService', () => {
         description: 'Partly cloudy',
         feelsLikeTemp: 16,
         humidity: 65,
-        chance_of_rain: 10,
+        chanceOfRain: 10,
       });
     });
   });

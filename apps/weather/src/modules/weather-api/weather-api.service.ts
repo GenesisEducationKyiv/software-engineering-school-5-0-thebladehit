@@ -83,7 +83,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
       description: hourForecast.condition.text,
       feelsLikeTemp: hourForecast.feelslike_c,
       humidity: hourForecast.humidity,
-      chance_of_rain: hourForecast.chance_of_rain,
+      chanceOfRain: hourForecast.chance_of_rain,
     };
   }
 

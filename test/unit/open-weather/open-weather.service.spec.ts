@@ -122,7 +122,7 @@ describe('OpenWeatherService', () => {
         description: 'cloudy',
         feelsLikeTemp: 18,
         humidity: 55,
-        chance_of_rain: 0.1,
+        chanceOfRain: 0.1,
       });
     });
   });

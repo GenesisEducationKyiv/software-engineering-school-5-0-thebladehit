@@ -93,7 +93,7 @@ export class OpenWeatherService implements AbstractWeatherApiService {
       description: weatherInfo.description,
       feelsLikeTemp: hourForecast.main.feels_like,
       humidity: hourForecast.main.humidity,
-      chance_of_rain: hourForecast.pop,
+      chanceOfRain: hourForecast.pop,
     };
   }
 
