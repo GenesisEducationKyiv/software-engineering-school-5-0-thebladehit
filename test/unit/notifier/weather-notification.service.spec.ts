@@ -102,7 +102,7 @@ describe('WeatherNotificationService', () => {
         description: 'Cloudy',
         feelsLikeTemp: 16,
         humidity: 60,
-        chance_of_rain: 40,
+        chanceOfRain: 40,
       };
 
       mockedSubscriptionService.getHourlySubscribers.mockResolvedValueOnce(

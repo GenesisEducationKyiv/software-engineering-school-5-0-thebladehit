@@ -5,5 +5,5 @@ export class SendHourlyForecastMailDto {
   description: string;
   feelsLikeTemp: number;
   humidity: number;
-  chance_of_rain: number;
+  chanceOfRain: number;
 }

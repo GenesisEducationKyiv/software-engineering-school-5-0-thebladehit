@@ -109,7 +109,7 @@ describe('MailServiceImpl', () => {
         temp: 22,
         feelsLikeTemp: 20,
         humidity: 55,
-        chance_of_rain: 10,
+        chanceOfRain: 10,
         description: 'Partly cloudy',
       };
 
