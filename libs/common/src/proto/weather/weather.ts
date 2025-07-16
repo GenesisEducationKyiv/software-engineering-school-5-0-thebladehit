@@ -77,7 +77,7 @@ export interface WeatherServiceClient {
 
   getDailyForecasts(request: CitiesRequests): Observable<CitiesDailyForecast>;
 
-  unsubscribeSubscription(request: CitiesRequests): Observable<CitiesHourlyForecast>;
+  getHourlyForecasts(request: CitiesRequests): Observable<CitiesHourlyForecast>;
 }
 
 export interface WeatherServiceController {
@@ -87,14 +87,14 @@ export interface WeatherServiceController {
     request: CitiesRequests,
   ): Promise<CitiesDailyForecast> | Observable<CitiesDailyForecast> | CitiesDailyForecast;
 
-  unsubscribeSubscription(
+  getHourlyForecasts(
     request: CitiesRequests,
   ): Promise<CitiesHourlyForecast> | Observable<CitiesHourlyForecast> | CitiesHourlyForecast;
 }
 
 export function WeatherServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["getWeather", "getDailyForecasts", "unsubscribeSubscription"];
+    const grpcMethods: string[] = ["getWeather", "getDailyForecasts", "getHourlyForecasts"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("WeatherService", method)(constructor.prototype[method], method, descriptor);
