@@ -1,0 +1,58 @@
+syntax="proto3";
+
+package weather;
+
+service WeatherService {
+  rpc GetWeather(CityRequest) returns (WeatherResponse);
+  rpc GetDailyForecasts(CitiesRequests) returns (CitiesDailyForecast);
+  rpc UnsubscribeSubscription(CitiesRequests) returns (CitiesHourlyForecast);
+}
+
+message CreateSubscriptionRequest {
+  string email = 1;
+  string city = 2;
+  string frequency = 3;
+}
+
+message CityRequest {
+  string city = 1;
+}
+
+message CitiesRequests {
+  repeated string cities = 1;
+}
+
+message DailyForecast {
+  float maxTemp = 1;
+  float minTemp = 2;
+  float avgTemp = 3;
+  float avgHumidity = 4;
+  float chanceOfRain = 5;
+  string description = 6;
+  string sunrise = 7;
+  string sunset = 8;
+}
+
+message CitiesDailyForecast {
+  map<string, DailyForecast> forecasts = 1;
+}
+
+message HourlyForecast {
+  double temp = 1;
+  string description = 2;
+  double feels_like_temp = 3;
+  double humidity = 4;
+  double chanceOfRain = 5;
+}
+
+message CitiesHourlyForecast {
+  map<string, HourlyForecast> forecasts = 1;
+}
+
+message WeatherResponse {
+  float temperature = 1;
+  float humidity = 2;
+  string description = 3;
+}
+
+message Empty {}
