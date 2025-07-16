@@ -3,15 +3,15 @@ FROM node:22-alpine AS development
 WORKDIR /usr/src/app
 
 COPY --chown=node:node package*.json ./
+COPY --chown=node:node /apps/notifications/package.json ./apps/notifications/package.json
 
+RUN npm ci
 
 COPY --chown=node:node tsconfig.json tsconfig.json
 COPY --chown=node:node nest-cli.json nest-cli.json
 
 COPY --chown=node:node apps/notifications apps/notifications
 COPY --chown=node:node libs libs
-
-RUN npm ci
 
 FROM node:22-alpine AS build
 
