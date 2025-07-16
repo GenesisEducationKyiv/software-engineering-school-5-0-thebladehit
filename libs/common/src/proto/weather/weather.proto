@@ -5,7 +5,7 @@ package weather;
 service WeatherService {
   rpc GetWeather(CityRequest) returns (WeatherResponse);
   rpc GetDailyForecasts(CitiesRequests) returns (CitiesDailyForecast);
-  rpc UnsubscribeSubscription(CitiesRequests) returns (CitiesHourlyForecast);
+  rpc GetHourlyForecasts(CitiesRequests) returns (CitiesHourlyForecast);
 }
 
 message CreateSubscriptionRequest {
