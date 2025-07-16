@@ -1,13 +1,13 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom, map } from 'rxjs';
 
+import {
+  CityNotFoundError,
+  InvalidExternalResponse,
+  UnexpectedError,
+} from '@app/common/errors';
 import {
   WeatherDailyForecastDto,
   WeatherHourlyForecastDto,
@@ -37,7 +37,10 @@ export class WeatherAPIService implements AbstractWeatherApiService {
 
   async getWeather(city: string): Promise<WeatherResponseDto> {
     const url = `${this.baseURL}/current.json?key=${this.apiKey}&q=${encodeURIComponent(city)}`;
-    const response = await this.fetchWeatherDataFromAPI<WeatherAPIDto>(url);
+    const response = await this.fetchWeatherDataFromAPI<WeatherAPIDto>(
+      url,
+      city
+    );
     this.logger.log(response);
     return {
       temperature: response.current.temp_c,
@@ -48,12 +51,14 @@ export class WeatherAPIService implements AbstractWeatherApiService {
 
   async getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
     const url = `${this.baseURL}/forecast.json?key=${this.apiKey}&q=${encodeURIComponent(city)}&days=1`;
-    const response =
-      await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
+    const response = await this.fetchWeatherDataFromAPI<ForecastResponseDto>(
+      url,
+      city
+    );
     this.logger.log(response);
     const dayForecast = response.forecast.forecastday[0];
     if (!dayForecast) {
-      throw new InternalServerErrorException();
+      throw new InvalidExternalResponse(this.baseURL);
     }
     return {
       maxTemp: dayForecast.day.maxtemp_c,
@@ -70,12 +75,14 @@ export class WeatherAPIService implements AbstractWeatherApiService {
   async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
     const now = new Date();
     const url = `${this.baseURL}/forecast.json?key=${this.apiKey}&q=${encodeURIComponent(city)}&hour=${now.getHours()}`;
-    const response =
-      await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
+    const response = await this.fetchWeatherDataFromAPI<ForecastResponseDto>(
+      url,
+      city
+    );
     this.logger.log(response);
     const dayForecast = response.forecast.forecastday[0];
     if (!dayForecast || !dayForecast.hour[0]) {
-      throw new InternalServerErrorException();
+      throw new InvalidExternalResponse(this.baseURL);
     }
     const hourForecast = dayForecast.hour[0];
     return {
@@ -87,16 +94,19 @@ export class WeatherAPIService implements AbstractWeatherApiService {
     };
   }
 
-  private async fetchWeatherDataFromAPI<T>(url: string): Promise<T> {
+  private async fetchWeatherDataFromAPI<T>(
+    url: string,
+    city: string
+  ): Promise<T> {
     return firstValueFrom(
       this.httpService.get<T>(url).pipe(
         map((response) => response.data),
         catchError((error) => {
           const data = error?.response?.data as ErrorResponse;
           if (data?.error?.code === 1006) {
-            throw new NotFoundException();
+            throw new CityNotFoundError(city);
           }
-          throw new InternalServerErrorException();
+          throw new UnexpectedError();
         })
       )
     );

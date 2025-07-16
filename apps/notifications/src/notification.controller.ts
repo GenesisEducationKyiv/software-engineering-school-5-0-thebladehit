@@ -1,4 +1,5 @@
 import {
+  ConfirmationRequest,
   DailyForecastRequest,
   Empty,
   HourlyForecastRequest,
@@ -20,7 +21,7 @@ import { MailService } from './mail.service';
 export class NotificationController implements NotificationsServiceController {
   constructor(private readonly notificationService: MailService) {}
 
-  async sendConfirmation(request: SendConfirmationMailDto): Promise<Empty> {
+  async sendConfirmation(request: ConfirmationRequest): Promise<Empty> {
     const dto = await validateAndGetDto(SendConfirmationMailDto, request);
     this.notificationService.sendSubscriptionConfirmation(dto);
     return {};

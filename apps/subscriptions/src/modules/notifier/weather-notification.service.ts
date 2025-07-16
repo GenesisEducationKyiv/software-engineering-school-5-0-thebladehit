@@ -39,7 +39,7 @@ export class WeatherNotification {
 
       const promises = subscriptions.map((sub) => {
         const forecast = forecasts[sub.city.name];
-        if (forecast === null) return;
+        if (!forecast) return;
         return this.notificationsService.sendDailyForecast({
           email: sub.user.email,
           city: sub.city.name,
@@ -70,7 +70,7 @@ export class WeatherNotification {
 
       const promises = subscriptions.map((sub) => {
         const forecast = forecasts[sub.city.name];
-        if (forecast === null) return;
+        if (!forecast) return;
         return this.notificationsService.sendHourlyForecast({
           email: sub.user.email,
           city: sub.city.name,

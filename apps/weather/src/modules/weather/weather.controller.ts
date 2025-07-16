@@ -1,44 +1,57 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 
 import {
-  CitiesDailyForecastDto,
-  CitiesHourlyForecastDto,
-  CityQueryDto,
-  WeatherResponseDto,
-} from '@app/common/types';
+  CitiesDailyForecast,
+  CitiesHourlyForecast,
+  CitiesRequests,
+  CityRequest,
+  WeatherResponse,
+  WeatherServiceController,
+  WeatherServiceControllerMethods,
+} from '@app/common/proto/weather';
+import { CityQueryDto } from '@app/common/types';
+import { mapGrpcError, validateAndGetDto } from '@app/common/utils';
 
 import { ForecastsDto } from './dto/forecasts.dto';
 import { WeatherService } from './weather.service';
 
-@Controller('weather')
-export class WeatherController {
+@Controller()
+@WeatherServiceControllerMethods()
+export class WeatherController implements WeatherServiceController {
   constructor(private readonly weatherService: WeatherService) {}
 
-  @Get()
-  @UsePipes(new ValidationPipe({ transform: true }))
-  getWeather(@Query() query: CityQueryDto): Promise<WeatherResponseDto> {
-    return this.weatherService.getWeather(query.city);
+  async getWeather(query: CityRequest): Promise<WeatherResponse> {
+    try {
+      const dto = await validateAndGetDto(CityQueryDto, query);
+      return await this.weatherService.getWeather(dto.city);
+    } catch (err) {
+      mapGrpcError(err);
+    }
   }
 
-  @Post('/daily-forecasts')
-  getDailyForecasts(
-    @Body() dto: ForecastsDto
-  ): Promise<CitiesDailyForecastDto> {
-    return this.weatherService.getDailyForecasts(dto.cities);
+  async getDailyForecasts(query: CitiesRequests): Promise<CitiesDailyForecast> {
+    try {
+      const dto = await validateAndGetDto(ForecastsDto, query);
+      const dailyForecasts = await this.weatherService.getDailyForecasts(
+        dto.cities
+      );
+      return { forecasts: dailyForecasts };
+    } catch (err) {
+      mapGrpcError(err);
+    }
   }
 
-  @Post('/hourly-forecasts')
-  getHourlyForecasts(
-    @Body() dto: ForecastsDto
-  ): Promise<CitiesHourlyForecastDto> {
-    return this.weatherService.getHourlyForecasts(dto.cities);
+  async getHourlyForecasts(
+    query: CitiesRequests
+  ): Promise<CitiesHourlyForecast> {
+    try {
+      const dto = await validateAndGetDto(ForecastsDto, query);
+      const hourlyForecasts = await this.weatherService.getHourlyForecasts(
+        dto.cities
+      );
+      return { forecasts: hourlyForecasts };
+    } catch (err) {
+      mapGrpcError(err);
+    }
   }
 }

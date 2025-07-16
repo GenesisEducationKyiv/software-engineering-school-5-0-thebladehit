@@ -1,9 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
+import { CityNotFoundError } from '@app/common/errors';
 import {
   CitiesDailyForecastDto,
   CitiesHourlyForecastDto,
@@ -24,22 +21,15 @@ export class WeatherService {
   ) {}
 
   async getWeather(city: string): Promise<WeatherResponseDto> {
-    try {
-      const cachedData = await this.cache.weatherByCity.get(city);
-      if (cachedData) {
-        this.metricService.incFromCache();
-        return cachedData;
-      }
-      const weatherData = await this.weatherApiService.getWeather(city);
-      this.metricService.incFromApi();
-      await this.cache.weatherByCity.set(city, weatherData);
-      return weatherData;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new BadRequestException(error);
+    const cachedData = await this.cache.weatherByCity.get(city);
+    if (cachedData) {
+      this.metricService.incFromCache();
+      return cachedData;
     }
+    const weatherData = await this.weatherApiService.getWeather(city);
+    this.metricService.incFromApi();
+    await this.cache.weatherByCity.set(city, weatherData);
+    return weatherData;
   }
 
   async getDailyForecasts(cities: string[]): Promise<CitiesDailyForecastDto> {
@@ -55,13 +45,12 @@ export class WeatherService {
       const forecastData = await this.weatherApiService
         .getDailyForecast(city)
         .catch((err) => {
-          if (err instanceof NotFoundException) {
+          if (err instanceof CityNotFoundError) {
             return null;
           }
           throw err;
         });
       if (forecastData === null) {
-        result[city] = null;
         continue;
       }
       this.metricService.incFromApi();
@@ -85,13 +74,12 @@ export class WeatherService {
       const forecastData = await this.weatherApiService
         .getHourlyForecast(city)
         .catch((err) => {
-          if (err instanceof NotFoundException) {
+          if (err instanceof CityNotFoundError) {
             return null;
           }
           throw err;
         });
       if (forecastData === null) {
-        result[city] = null;
         continue;
       }
       this.metricService.incFromApi();
