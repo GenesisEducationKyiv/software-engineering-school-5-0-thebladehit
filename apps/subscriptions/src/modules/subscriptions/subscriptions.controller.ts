@@ -1,39 +1,46 @@
-import { CreateSubscriptionDto, StatusResponseDto } from '@app/common/types';
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+  CreateSubscriptionRequest,
+  Empty,
+  SubscriptionsServiceController,
+  SubscriptionsServiceControllerMethods,
+  TokenRequest,
+} from '@app/common/proto/subscriptions';
+import { CreateSubscriptionDto } from '@app/common/types';
+import { mapGrpcError, validateAndGetDto } from '@app/common/utils';
+import { Controller } from '@nestjs/common';
 
 import { SubscriptionsService } from './subscriptions.service';
 
 @Controller()
-export class SubscriptionsController {
+@SubscriptionsServiceControllerMethods()
+export class SubscriptionsController implements SubscriptionsServiceController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
-  @HttpCode(HttpStatus.OK)
-  @Post('/subscribe')
-  createSubscription(@Body() dto: CreateSubscriptionDto): Promise<void> {
-    return this.subscriptionsService.createSubscription(dto);
+  async createSubscription(query: CreateSubscriptionRequest): Promise<Empty> {
+    try {
+      const dto = await validateAndGetDto(CreateSubscriptionDto, query);
+      await this.subscriptionsService.createSubscription(dto);
+      return {};
+    } catch (err) {
+      mapGrpcError(err);
+    }
   }
 
-  @Get('/confirm/:token')
-  async confirmSubscription(
-    @Param('token') token: string
-  ): Promise<StatusResponseDto> {
-    await this.subscriptionsService.confirmSubscription(token);
-    return { status: 'ok', message: 'Subscription confirmed successfully' };
+  async confirmSubscription(query: TokenRequest): Promise<Empty> {
+    try {
+      await this.subscriptionsService.confirmSubscription(query.token);
+      return {};
+    } catch (err) {
+      mapGrpcError(err);
+    }
   }
 
-  @Get('/unsubscribe/:token')
-  async unsubscribeSubscription(
-    @Param('token') token: string
-  ): Promise<StatusResponseDto> {
-    await this.subscriptionsService.unsubscribeSubscription(token);
-    return { status: 'ok', message: 'Unsubscribed successfully' };
+  async unsubscribeSubscription(query: TokenRequest): Promise<Empty> {
+    try {
+      await this.subscriptionsService.unsubscribeSubscription(query.token);
+      return {};
+    } catch (err) {
+      mapGrpcError(err);
+    }
   }
 }
