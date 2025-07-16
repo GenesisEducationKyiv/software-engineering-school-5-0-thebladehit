@@ -1,13 +1,13 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom, map } from 'rxjs';
 
+import {
+  CityNotFoundError,
+  InvalidExternalResponse,
+  UnexpectedError,
+} from '@app/common/errors';
 import {
   WeatherDailyForecastDto,
   WeatherHourlyForecastDto,
@@ -37,11 +37,14 @@ export class OpenWeatherService implements AbstractWeatherApiService {
 
   async getWeather(city: string): Promise<WeatherResponseDto> {
     const url = `${this.baseURL}/weather?appid=${this.apiKey}&q=${encodeURIComponent(city)}&units=metric`;
-    const response = await this.fetchWeatherDataFromAPI<CurrentWeatherDto>(url);
+    const response = await this.fetchWeatherDataFromAPI<CurrentWeatherDto>(
+      url,
+      city
+    );
     this.logger.log(response);
     const weatherInfo = response.weather[0];
     if (!weatherInfo) {
-      throw new InternalServerErrorException();
+      throw new InvalidExternalResponse(this.baseURL);
     }
     return {
       temperature: response.main.temp,
@@ -52,16 +55,18 @@ export class OpenWeatherService implements AbstractWeatherApiService {
 
   async getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
     const url = `${this.baseURL}/forecast?appid=${this.apiKey}&q=${encodeURIComponent(city)}&units=metric&cnt=8`;
-    const response =
-      await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
+    const response = await this.fetchWeatherDataFromAPI<ForecastResponseDto>(
+      url,
+      city
+    );
     this.logger.log(response);
     const hourForecasts = response.list;
     if (hourForecasts.length === 0) {
-      throw new InternalServerErrorException();
+      throw new InvalidExternalResponse(this.baseURL);
     }
     const weatherInfo = hourForecasts[0].weather[0];
     if (!weatherInfo) {
-      throw new InternalServerErrorException();
+      throw new InvalidExternalResponse(this.baseURL);
     }
     return {
       maxTemp: this.getMaxTemp(hourForecasts),
@@ -77,16 +82,18 @@ export class OpenWeatherService implements AbstractWeatherApiService {
 
   async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
     const url = `${this.baseURL}/forecast?appid=${this.apiKey}&q=${encodeURIComponent(city)}&cnt=1&units=metric`;
-    const response =
-      await this.fetchWeatherDataFromAPI<ForecastResponseDto>(url);
+    const response = await this.fetchWeatherDataFromAPI<ForecastResponseDto>(
+      url,
+      city
+    );
     this.logger.log(response);
     const hourForecast = response.list[0];
     if (!hourForecast) {
-      throw new InternalServerErrorException();
+      throw new InvalidExternalResponse(this.baseURL);
     }
     const weatherInfo = hourForecast.weather[0];
     if (!weatherInfo) {
-      throw new InternalServerErrorException();
+      throw new InvalidExternalResponse(this.baseURL);
     }
     return {
       temp: hourForecast.main.temp,
@@ -97,16 +104,19 @@ export class OpenWeatherService implements AbstractWeatherApiService {
     };
   }
 
-  private async fetchWeatherDataFromAPI<T>(url: string): Promise<T> {
+  private async fetchWeatherDataFromAPI<T>(
+    url: string,
+    city: string
+  ): Promise<T> {
     return firstValueFrom(
       this.httpService.get<T>(url).pipe(
         map((response) => response.data),
         catchError((error) => {
           const data = error?.response?.data as ErrorResponseDto;
           if (Number(data.cod) === 404) {
-            throw new NotFoundException();
+            throw new CityNotFoundError(city);
           }
-          throw new InternalServerErrorException();
+          throw new UnexpectedError();
         })
       )
     );

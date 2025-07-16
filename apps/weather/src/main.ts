@@ -1,9 +1,12 @@
-import { ValidationPipe } from '@nestjs/common';
+import { join } from 'path';
+
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { WinstonModule } from 'nest-winston';
 
 import { winstonConfig } from '@app/common/logger';
+import { WEATHER_PACKAGE_NAME } from '@app/common/proto/weather';
 
 import { WeatherModule } from './modules/weather/weather.module';
 
@@ -12,13 +15,20 @@ async function bootstrap(): Promise<void> {
     logger: WinstonModule.createLogger(winstonConfig),
   });
   const configService = app.get(ConfigService);
-  app.setGlobalPrefix('api');
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-    })
-  );
-  await app.listen(configService.get('PORT') ?? 3001);
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      package: WEATHER_PACKAGE_NAME,
+      protoPath: join(
+        __dirname,
+        '..',
+        '..',
+        'libs/common/src/proto/weather.proto'
+      ),
+      url: configService.get('GRPC_URL'),
+    },
+  });
+  await app.startAllMicroservices();
 }
 
 bootstrap();

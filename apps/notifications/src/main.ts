@@ -2,7 +2,6 @@ import { join } from 'path';
 
 import { winstonConfig } from '@app/common/logger';
 import { NOTIFICATIONS_PACKAGE_NAME } from '@app/common/proto/notifications';
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';

@@ -20,6 +20,7 @@ import { SubscriptionsModule } from './modules/subscriptions/subscriptions.modul
         WEATHER_URL: Joi.string().required(),
         BATCH_SIZE: Joi.number().required(),
         NOTIFICATIONS_GRPC_URL: Joi.string().required(),
+        WEATHER_GRPC_URL: Joi.string().required(),
       }),
     }),
     SubscriptionsModule,
