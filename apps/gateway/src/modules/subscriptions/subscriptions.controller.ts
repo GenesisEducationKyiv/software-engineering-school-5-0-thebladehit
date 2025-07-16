@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { CreateSubscriptionDto, StatusResponseDto } from '@app/common/types';
+import { mapGrpcToHttpError } from '@app/common/utils';
 
 import { SubscriptionsService } from './subscriptions.service';
 
@@ -9,21 +10,33 @@ export class SubscriptionsController {
   constructor(private readonly service: SubscriptionsService) {}
 
   @Post('/subscribe')
-  createSubscription(@Body() dto: CreateSubscriptionDto): Promise<void> {
-    return this.service.createSubscription(dto);
+  async createSubscription(@Body() dto: CreateSubscriptionDto): Promise<void> {
+    try {
+      return await this.service.createSubscription(dto);
+    } catch (err) {
+      mapGrpcToHttpError(err);
+    }
   }
 
   @Get('/confirm/:token')
-  confirmSubscription(
+  async confirmSubscription(
     @Param('token') token: string
   ): Promise<StatusResponseDto> {
-    return this.service.confirmSubscription(token);
+    try {
+      return await this.service.confirmSubscription(token);
+    } catch (err) {
+      mapGrpcToHttpError(err);
+    }
   }
 
   @Get('/unsubscribe/:token')
-  unsubscribeSubscription(
+  async unsubscribeSubscription(
     @Param('token') token: string
   ): Promise<StatusResponseDto> {
-    return this.service.unsubscribeSubscription(token);
+    try {
+      return await this.service.unsubscribeSubscription(token);
+    } catch (err) {
+      mapGrpcToHttpError(err);
+    }
   }
 }

@@ -1,75 +1,46 @@
-import { HttpService } from '@nestjs/axios';
-import { HttpException, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { isAxiosError } from 'axios';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
+import {
+  SUBSCRIPTIONS_PACKAGE_NAME,
+  SUBSCRIPTIONS_SERVICE_NAME,
+  SubscriptionsServiceClient,
+} from '@app/common/proto/subscriptions';
 import { CreateSubscriptionDto, StatusResponseDto } from '@app/common/types';
 
 @Injectable()
-export class SubscriptionsService {
-  private readonly subscriptionUrl: string;
+export class SubscriptionsService implements OnModuleInit {
   private readonly logger = new Logger(SubscriptionsService.name);
+  private subscriptionGrpcService: SubscriptionsServiceClient;
 
   constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService
-  ) {
-    this.subscriptionUrl = this.configService.get('SUBSCRIPTION_URL');
+    @Inject(SUBSCRIPTIONS_PACKAGE_NAME) private readonly client: ClientGrpc
+  ) {}
+
+  onModuleInit(): void {
+    this.subscriptionGrpcService =
+      this.client.getService<SubscriptionsServiceClient>(
+        SUBSCRIPTIONS_SERVICE_NAME
+      );
   }
 
   async createSubscription(dto: CreateSubscriptionDto): Promise<void> {
-    try {
-      const url = `${this.subscriptionUrl}/subscribe`;
-      await firstValueFrom(this.httpService.post(url, dto));
-      return;
-    } catch (err) {
-      if (isAxiosError(err)) {
-        if (err.code === 'ECONNREFUSED') {
-          this.logger.error('Subscription service in not reachable');
-        } else if (err.status >= 400 && err.status < 500) {
-          throw new HttpException(err.response?.data, err.status);
-        }
-      }
-      throw err;
-    }
+    await firstValueFrom(this.subscriptionGrpcService.createSubscription(dto));
+    return;
   }
 
   async confirmSubscription(token: string): Promise<StatusResponseDto> {
-    try {
-      const url = `${this.subscriptionUrl}/confirm/${token}`;
-      const response = await firstValueFrom(
-        this.httpService.get<StatusResponseDto>(url)
-      );
-      return response.data;
-    } catch (err) {
-      if (isAxiosError(err)) {
-        if (err.code === 'ECONNREFUSED') {
-          this.logger.error('Subscription service in not reachable');
-        } else if (err.status >= 400 && err.status < 500) {
-          throw new HttpException(err.response?.data, err.status);
-        }
-      }
-      throw err;
-    }
+    await firstValueFrom(
+      this.subscriptionGrpcService.confirmSubscription({ token })
+    );
+    return { status: 'ok', message: 'Subscription confirmed' };
   }
 
   async unsubscribeSubscription(token: string): Promise<StatusResponseDto> {
-    try {
-      const url = `${this.subscriptionUrl}/unsubscribe/${token}`;
-      const response = await firstValueFrom(
-        this.httpService.get<StatusResponseDto>(url)
-      );
-      return response.data;
-    } catch (err) {
-      if (isAxiosError(err)) {
-        if (err.code === 'ECONNREFUSED') {
-          this.logger.error('Subscription service in not reachable');
-        } else if (err.status >= 400 && err.status < 500) {
-          throw new HttpException(err.response?.data, err.status);
-        }
-      }
-      throw err;
-    }
+    await firstValueFrom(
+      this.subscriptionGrpcService.unsubscribeSubscription({ token })
+    );
+    return { status: 'ok', message: 'Subscription unsubscribed' };
   }
 }
