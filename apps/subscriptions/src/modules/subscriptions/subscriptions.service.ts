@@ -1,10 +1,10 @@
-import { CreateSubscriptionDto } from '@app/common/types';
 import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+  DuplicateSubscriptionException,
+  SubscriptionConfirmedException,
+  SubscriptionNotFoundException,
+} from '@app/common/errors';
+import { CreateSubscriptionDto } from '@app/common/types';
+import { Injectable } from '@nestjs/common';
 import { Subscription, SubscriptionType } from '@prisma/client';
 
 import { CityService } from '../city/city.service';
@@ -47,7 +47,7 @@ export class SubscriptionsService {
     const isDuplicate =
       await this.subscriptionRepository.isDuplicateSubscription(dto);
     if (isDuplicate) {
-      throw new ConflictException('You already subscribed to this city.');
+      throw new DuplicateSubscriptionException(dto.city, dto.frequency);
     }
     const cityId = await this.cityService.getCityId(dto.city);
     const subscription = await this.subscriptionRepository.createSubscription(
@@ -66,12 +66,10 @@ export class SubscriptionsService {
     const subscription =
       await this.subscriptionRepository.findSubscriptionByToken(token);
     if (!subscription) {
-      throw new NotFoundException('Subscription with such id does not exist');
+      throw new SubscriptionNotFoundException(token);
     }
     if (subscription.isConfirmed) {
-      throw new BadRequestException(
-        'You have already confirm this subscriptions'
-      );
+      throw new SubscriptionConfirmedException(token);
     }
     await this.subscriptionRepository.confirmSubscription(token);
   }
@@ -80,7 +78,7 @@ export class SubscriptionsService {
     const subscription =
       await this.subscriptionRepository.findSubscriptionByToken(token);
     if (!subscription) {
-      throw new NotFoundException('Subscription with such id does not exist');
+      throw new SubscriptionNotFoundException(token);
     }
     await this.deleteSubscription(token);
   }

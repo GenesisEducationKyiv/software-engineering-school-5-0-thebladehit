@@ -4,8 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom, map } from 'rxjs';
 
 import {
-  CityNotFoundError,
-  InvalidExternalResponse,
+  CityNotFoundException,
+  InvalidExternalResponseError,
   UnexpectedError,
 } from '@app/common/errors';
 import {
@@ -44,7 +44,7 @@ export class OpenWeatherService implements AbstractWeatherApiService {
     this.logger.log(response);
     const weatherInfo = response.weather[0];
     if (!weatherInfo) {
-      throw new InvalidExternalResponse(this.baseURL);
+      throw new InvalidExternalResponseError(this.baseURL);
     }
     return {
       temperature: response.main.temp,
@@ -62,11 +62,11 @@ export class OpenWeatherService implements AbstractWeatherApiService {
     this.logger.log(response);
     const hourForecasts = response.list;
     if (hourForecasts.length === 0) {
-      throw new InvalidExternalResponse(this.baseURL);
+      throw new InvalidExternalResponseError(this.baseURL);
     }
     const weatherInfo = hourForecasts[0].weather[0];
     if (!weatherInfo) {
-      throw new InvalidExternalResponse(this.baseURL);
+      throw new InvalidExternalResponseError(this.baseURL);
     }
     return {
       maxTemp: this.getMaxTemp(hourForecasts),
@@ -89,11 +89,11 @@ export class OpenWeatherService implements AbstractWeatherApiService {
     this.logger.log(response);
     const hourForecast = response.list[0];
     if (!hourForecast) {
-      throw new InvalidExternalResponse(this.baseURL);
+      throw new InvalidExternalResponseError(this.baseURL);
     }
     const weatherInfo = hourForecast.weather[0];
     if (!weatherInfo) {
-      throw new InvalidExternalResponse(this.baseURL);
+      throw new InvalidExternalResponseError(this.baseURL);
     }
     return {
       temp: hourForecast.main.temp,
@@ -114,7 +114,7 @@ export class OpenWeatherService implements AbstractWeatherApiService {
         catchError((error) => {
           const data = error?.response?.data as ErrorResponseDto;
           if (Number(data.cod) === 404) {
-            throw new CityNotFoundError(city);
+            throw new CityNotFoundException(city);
           }
           throw new UnexpectedError();
         })

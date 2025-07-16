@@ -4,8 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom, map } from 'rxjs';
 
 import {
-  CityNotFoundError,
-  InvalidExternalResponse,
+  CityNotFoundException,
+  InvalidExternalResponseError,
   UnexpectedError,
 } from '@app/common/errors';
 import {
@@ -58,7 +58,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
     this.logger.log(response);
     const dayForecast = response.forecast.forecastday[0];
     if (!dayForecast) {
-      throw new InvalidExternalResponse(this.baseURL);
+      throw new InvalidExternalResponseError(this.baseURL);
     }
     return {
       maxTemp: dayForecast.day.maxtemp_c,
@@ -82,7 +82,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
     this.logger.log(response);
     const dayForecast = response.forecast.forecastday[0];
     if (!dayForecast || !dayForecast.hour[0]) {
-      throw new InvalidExternalResponse(this.baseURL);
+      throw new InvalidExternalResponseError(this.baseURL);
     }
     const hourForecast = dayForecast.hour[0];
     return {
@@ -104,7 +104,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
         catchError((error) => {
           const data = error?.response?.data as ErrorResponse;
           if (data?.error?.code === 1006) {
-            throw new CityNotFoundError(city);
+            throw new CityNotFoundException(city);
           }
           throw new UnexpectedError();
         })

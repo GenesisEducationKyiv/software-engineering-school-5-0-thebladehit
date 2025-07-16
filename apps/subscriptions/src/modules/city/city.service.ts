@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { CityNotFoundException } from '@app/common/errors';
+import { Injectable } from '@nestjs/common';
 
 import { AbstractCityApiService } from '../../abstracts/city-api.abstract';
 
@@ -18,7 +19,7 @@ export class CityService {
     }
     const isCityExists = await this.cityApiService.isCityExists(name);
     if (!isCityExists) {
-      throw new NotFoundException(`City ${name} not found`);
+      throw new CityNotFoundException(name);
     }
     const city = await this.cityRepository.createCity(name);
     return city.id;
