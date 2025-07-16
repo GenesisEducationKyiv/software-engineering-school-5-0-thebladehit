@@ -20,7 +20,7 @@ import { NotificationController } from './notification.controller';
         SMTP_USERNAME: Joi.string().required(),
         SMTP_PASSWORD: Joi.string().required(),
         BACK_BASE_URL: Joi.string().required(),
-        PORT: Joi.number().required(),
+        GRPC_URL: Joi.string().required(),
       }),
     }),
     MailerModule.forRootAsync({

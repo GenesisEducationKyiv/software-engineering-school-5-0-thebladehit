@@ -1,28 +1,40 @@
 import {
+  DailyForecastRequest,
+  Empty,
+  HourlyForecastRequest,
+  NotificationsServiceController,
+  NotificationsServiceControllerMethods,
+} from '@app/common/proto/notifications';
+import {
   SendConfirmationMailDto,
   SendDailyForecastMailDto,
   SendHourlyForecastMailDto,
 } from '@app/common/types';
-import { Body, Controller, Post } from '@nestjs/common';
+import { validateAndGetDto } from '@app/common/utils';
+import { Controller } from '@nestjs/common';
 
 import { MailService } from './mail.service';
 
 @Controller()
-export class NotificationController {
+@NotificationsServiceControllerMethods()
+export class NotificationController implements NotificationsServiceController {
   constructor(private readonly notificationService: MailService) {}
 
-  @Post('/confirmation')
-  sendConfirmation(@Body() dto: SendConfirmationMailDto): Promise<void> {
-    return this.notificationService.sendSubscriptionConfirmation(dto);
+  async sendConfirmation(request: SendConfirmationMailDto): Promise<Empty> {
+    const dto = await validateAndGetDto(SendConfirmationMailDto, request);
+    this.notificationService.sendSubscriptionConfirmation(dto);
+    return {};
   }
 
-  @Post('/daily-forecast')
-  sendDailyForecast(@Body() dto: SendDailyForecastMailDto): Promise<void> {
-    return this.notificationService.sendDailyForecast(dto);
+  async sendDailyForecast(request: DailyForecastRequest): Promise<Empty> {
+    const dto = await validateAndGetDto(SendDailyForecastMailDto, request);
+    this.notificationService.sendDailyForecast(dto);
+    return {};
   }
 
-  @Post('/hourly-forecast')
-  sendHourlyForecast(@Body() dto: SendHourlyForecastMailDto): Promise<void> {
-    return this.notificationService.sendHourlyForecast(dto);
+  async sendHourlyForecast(request: HourlyForecastRequest): Promise<Empty> {
+    const dto = await validateAndGetDto(SendHourlyForecastMailDto, request);
+    this.notificationService.sendHourlyForecast(dto);
+    return {};
   }
 }
