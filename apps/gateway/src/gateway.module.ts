@@ -17,6 +17,8 @@ import { WeatherModule } from './modules/weather/weather.module';
       validationSchema: Joi.object({
         SUBSCRIPTION_URL: Joi.string().required(),
         WEATHER_URL: Joi.string().required(),
+        WEATHER_GRPC_URL: Joi.string().required(),
+        SUBSCRIPTIONS_GRPC_URL: Joi.string().required(),
         PORT: Joi.number().required(),
       }),
     }),
