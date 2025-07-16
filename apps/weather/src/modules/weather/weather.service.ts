@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { CityNotFoundError } from '@app/common/errors';
+import { CityNotFoundException } from '@app/common/errors';
 import {
   CitiesDailyForecastDto,
   CitiesHourlyForecastDto,
@@ -45,7 +45,7 @@ export class WeatherService {
       const forecastData = await this.weatherApiService
         .getDailyForecast(city)
         .catch((err) => {
-          if (err instanceof CityNotFoundError) {
+          if (err instanceof CityNotFoundException) {
             return null;
           }
           throw err;
@@ -74,7 +74,7 @@ export class WeatherService {
       const forecastData = await this.weatherApiService
         .getHourlyForecast(city)
         .catch((err) => {
-          if (err instanceof CityNotFoundError) {
+          if (err instanceof CityNotFoundException) {
             return null;
           }
           throw err;

@@ -1,10 +1,6 @@
+import { CityNotFoundException, UnexpectedError } from '@app/common/errors';
 import { HttpService } from '@nestjs/axios';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
 import { catchError, firstValueFrom } from 'rxjs';
@@ -36,16 +32,16 @@ export class CityOpenWeatherService implements AbstractCityApiService {
             this.logger.error(error.response?.data);
             const errorCode = error.response?.data?.cod;
             if (Number(errorCode) === 404) {
-              throw new NotFoundException();
+              throw new CityNotFoundException(name);
             }
-            throw new InternalServerErrorException();
+            throw new UnexpectedError();
           })
         )
       );
       this.logger.log(result.data);
       return true;
     } catch (err) {
-      if (err instanceof NotFoundException) {
+      if (err instanceof CityNotFoundException) {
         return false;
       }
       throw err;

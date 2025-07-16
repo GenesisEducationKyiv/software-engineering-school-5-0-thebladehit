@@ -1,4 +1,4 @@
-export class InvalidExternalResponse extends Error {
+export class InvalidExternalResponseError extends Error {
   constructor(url: string) {
     super(`Invalid response from URL: ${url} `);
   }
