@@ -12,7 +12,8 @@ services:
     env_file:
       - .env.test
     environment:
-      PORT: 3001
+      PORT: 3011
+      GRPC_URL: "0.0.0.0:3001"
     command: npm run start weather
     depends_on:
       redis:
@@ -31,7 +32,8 @@ services:
     env_file:
       - .env.test
     environment:
-      PORT: 3002
+      PORT: 3012
+      GRPC_URL: "0.0.0.0:3002"
     command: npm run start notifications
     depends_on:
       mailhog:
@@ -45,10 +47,12 @@ services:
     restart: always
     ports:
       - "3000:3000"
+      - "3010:3010"
     env_file:
       - .env.test
     environment:
-      PORT: 3000
+      PORT: 3010
+      GRPC_URL: "0.0.0.0:3000"
       DATABASE_URL: "postgresql://postgres:1111@postgres:5432/weather?schema=public"
     command: [ "sh", "-c", "npx prisma generate --schema=apps/subscriptions/src/prisma && npx prisma migrate deploy --schema=apps/subscriptions/src/prisma && npm run start subscriptions" ]
     depends_on:

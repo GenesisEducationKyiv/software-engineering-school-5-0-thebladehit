@@ -39,7 +39,7 @@ test.describe('Subscription form', () => {
     const message = page.locator('#message');
     await expect(message).toBeVisible();
     await expect(message).toHaveClass(/error/);
-    await expect(message).toHaveText(`City ${invalidCity} not found`);
+    await expect(message).toHaveText(`City "${invalidCity}" not found`);
   });
 
   test('Submitting empty form does not proceed (built-in validation)', async ({

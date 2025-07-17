@@ -1,10 +1,11 @@
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Subscription, SubscriptionType } from '@prisma/client';
+
+import {
+  DuplicateSubscriptionException,
+  SubscriptionConfirmedException,
+  SubscriptionNotFoundException,
+} from '@app/common/errors';
 
 import { CityService } from '../../../apps/subscriptions/src/modules/city/city.service';
 import { AbstractNotificationsService } from '../../../apps/subscriptions/src/modules/notifications/abstracts/notifications.abstract';
@@ -71,7 +72,7 @@ describe('SubscriptionsService', () => {
       );
 
       await expect(service.createSubscription(dto)).rejects.toThrow(
-        ConflictException
+        DuplicateSubscriptionException
       );
     });
 
@@ -111,7 +112,7 @@ describe('SubscriptionsService', () => {
       );
 
       await expect(service.confirmSubscription(token)).rejects.toThrow(
-        NotFoundException
+        SubscriptionNotFoundException
       );
     });
 
@@ -122,7 +123,7 @@ describe('SubscriptionsService', () => {
       } as Subscription);
 
       await expect(service.confirmSubscription(token)).rejects.toThrow(
-        BadRequestException
+        SubscriptionConfirmedException
       );
     });
 
@@ -149,7 +150,7 @@ describe('SubscriptionsService', () => {
       );
 
       await expect(service.confirmSubscription(token)).rejects.toThrow(
-        NotFoundException
+        SubscriptionNotFoundException
       );
     });
 
