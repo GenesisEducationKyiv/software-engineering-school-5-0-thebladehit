@@ -1,8 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import { InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
+
+import { UnexpectedError } from '@app/common/errors';
 
 import { CityWeatherApiService } from '../../../apps/subscriptions/src/modules/weather-api/city-weather-api.service';
 
@@ -81,7 +82,7 @@ describe('CityWeatherApiService', () => {
     mockedHttpService.get.mockReturnValue(throwError(() => axiosError));
 
     await expect(service.isCityExists('SomeCity')).rejects.toThrow(
-      InternalServerErrorException
+      UnexpectedError
     );
   });
 });

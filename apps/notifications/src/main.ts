@@ -28,6 +28,7 @@ async function bootstrap(): Promise<void> {
     },
   });
   await app.startAllMicroservices();
+  await app.listen(configService.get('PORT') ?? 3012);
 }
 
 bootstrap();

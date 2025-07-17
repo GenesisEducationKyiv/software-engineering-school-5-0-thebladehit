@@ -64,18 +64,20 @@ describe('WeatherNotificationService', () => {
   describe('notifyDailySubscribers', () => {
     it('should send daily forecasts to subscribers', async () => {
       const subscribers = [
-        { id: '1', city: 'Kyiv', user: { email: 'a@a.com' } },
-        { id: '2', city: 'Kyiv', user: { email: 'b@b.com' } },
+        { id: '1', city: { name: 'Kyiv' }, user: { email: 'a@a.com' } },
+        { id: '2', city: { name: 'Kyiv' }, user: { email: 'b@b.com' } },
       ];
       const forecast = {
-        maxTemp: 20,
-        minTemp: 10,
-        avgTemp: 15,
-        avgHumidity: 50,
-        chanceOfRain: 30,
-        description: 'Sunny',
-        sunrise: '6:00 AM',
-        sunset: '8:00 PM',
+        Kyiv: {
+          maxTemp: 20,
+          minTemp: 10,
+          avgTemp: 15,
+          avgHumidity: 50,
+          chanceOfRain: 30,
+          description: 'Sunny',
+          sunrise: '6:00 AM',
+          sunset: '8:00 PM',
+        },
       };
 
       mockedSubscriptionService.getDailySubscribers.mockResolvedValueOnce(
@@ -98,11 +100,13 @@ describe('WeatherNotificationService', () => {
         { id: '1', city: { name: 'Lviv' }, user: { email: 'lviv@ukr.net' } },
       ];
       const forecast = {
-        temp: 17,
-        description: 'Cloudy',
-        feelsLikeTemp: 16,
-        humidity: 60,
-        chanceOfRain: 40,
+        Lviv: {
+          temp: 17,
+          description: 'Cloudy',
+          feelsLikeTemp: 16,
+          humidity: 60,
+          chanceOfRain: 40,
+        },
       };
 
       mockedSubscriptionService.getHourlySubscribers.mockResolvedValueOnce(

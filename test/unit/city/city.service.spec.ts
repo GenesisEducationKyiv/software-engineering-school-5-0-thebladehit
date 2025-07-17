@@ -1,5 +1,6 @@
-import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { CityNotFoundException } from '@app/common/errors';
 
 import { AbstractCityApiService } from '../../../apps/subscriptions/src/abstracts/city-api.abstract';
 import { AbstractCityRepository } from '../../../apps/subscriptions/src/modules/city/abstracts/city.repository.abstract';
@@ -65,7 +66,7 @@ describe('WeatherNotificationService', () => {
       mockedCityApiService.isCityExists.mockResolvedValue(false);
 
       await expect(service.getCityId('invalid city name')).rejects.toThrow(
-        NotFoundException
+        CityNotFoundException
       );
     });
   });
