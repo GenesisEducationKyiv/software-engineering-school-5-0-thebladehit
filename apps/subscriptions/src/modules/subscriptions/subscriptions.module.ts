@@ -1,3 +1,4 @@
+import { EventBusModule } from '@app/common/event-bus';
 import { Module } from '@nestjs/common';
 
 import { CityModule } from '../city/city.module';
@@ -10,7 +11,7 @@ import { SubscriptionsController } from './subscriptions.controller';
 import { SubscriptionsService } from './subscriptions.service';
 
 @Module({
-  imports: [PrismaModule, CityModule, NotificationsModule],
+  imports: [PrismaModule, CityModule, NotificationsModule, EventBusModule],
   controllers: [SubscriptionsController],
   providers: [
     SubscriptionsService,
