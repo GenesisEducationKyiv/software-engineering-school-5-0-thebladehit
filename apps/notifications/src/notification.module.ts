@@ -1,12 +1,19 @@
 import { join } from 'path';
 
+import {
+  AbstractEventBus,
+  Event, EventBusModule,
+  EventTypes,
+  SubscriptionCreatedEvent,
+} from '@app/common/event-bus';
 import { HealthModule } from '@app/common/health';
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import * as Joi from 'joi';
+import Joi from 'joi';
 
+import { SubscriptionCreatedHandler } from './handlers/subscription-created.handler';
 import { MailService } from './mail.service';
 import { NotificationController } from './notification.controller';
 
@@ -21,6 +28,7 @@ import { NotificationController } from './notification.controller';
         SMTP_PASSWORD: Joi.string().required(),
         BACK_BASE_URL: Joi.string().required(),
         GRPC_URL: Joi.string().required(),
+        RABBITMQ_URL: Joi.string().required(),
       }),
     }),
     MailerModule.forRootAsync({
@@ -49,8 +57,25 @@ import { NotificationController } from './notification.controller';
       }),
     }),
     HealthModule,
+    EventBusModule,
   ],
   controllers: [NotificationController],
-  providers: [MailService],
+  providers: [MailService, SubscriptionCreatedHandler],
 })
-export class NotificationModule {}
+export class NotificationModule implements OnModuleInit {
+  constructor(
+    private readonly eventBus: AbstractEventBus,
+    private readonly subscriptionCreatedHandler: SubscriptionCreatedHandler
+  ) {}
+
+  async onModuleInit(): Promise<void> {
+    await this.eventBus.subscribe(
+      EventTypes.SUBSCRIPTION_CREATED,
+      async (event: Event): Promise<void> => {
+        this.subscriptionCreatedHandler.handle(
+          event as SubscriptionCreatedEvent
+        );
+      }
+    );
+  }
+}

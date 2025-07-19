@@ -3,12 +3,15 @@ import {
   SubscriptionConfirmedException,
   SubscriptionNotFoundException,
 } from '@app/common/errors';
+import {
+  AbstractEventBus,
+  SubscriptionCreatedEvent,
+} from '@app/common/event-bus';
 import { CreateSubscriptionDto } from '@app/common/types';
 import { Injectable } from '@nestjs/common';
 import { Subscription, SubscriptionType } from '@prisma/client';
 
 import { CityService } from '../city/city.service';
-import { AbstractNotificationsService } from '../notifications/abstracts/notifications.abstract';
 
 import { AbstractSubscriptionRepository } from './abstracts/subscription.repository.abstract';
 import { SubscriptionWithUserAndCity } from './types/subscription-with-user-city';
@@ -18,7 +21,7 @@ export class SubscriptionsService {
   constructor(
     private readonly subscriptionRepository: AbstractSubscriptionRepository,
     private readonly cityService: CityService,
-    private readonly notificationsService: AbstractNotificationsService
+    private eventBus: AbstractEventBus
   ) {}
 
   getDailySubscribers(
@@ -54,12 +57,14 @@ export class SubscriptionsService {
       dto,
       cityId
     );
-    await this.notificationsService.sendSubscriptionConfirmation({
-      email: dto.email,
-      token: subscription.id,
-      city: dto.city,
-      frequency: dto.frequency,
-    });
+    await this.eventBus.publish(
+      new SubscriptionCreatedEvent({
+        email: dto.email,
+        token: subscription.id,
+        city: dto.city,
+        frequency: dto.frequency,
+      })
+    );
   }
 
   async confirmSubscription(token: string): Promise<void> {
