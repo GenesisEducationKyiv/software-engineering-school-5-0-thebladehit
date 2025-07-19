@@ -114,6 +114,18 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/data
+
   mailhog:
     image: mailhog/mailhog:latest
     container_name: mailhog-e2e
@@ -137,3 +149,4 @@ volumes:
   postgres_test_data:
   api_logs:
   redis_data:
+  rabbitmq_data:
