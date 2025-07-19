@@ -19,7 +19,6 @@ import { SubscriptionsModule } from './modules/subscriptions/subscriptions.modul
         NOTIFICATIONS_URL: Joi.string().required(),
         WEATHER_URL: Joi.string().required(),
         BATCH_SIZE: Joi.number().required(),
-        NOTIFICATIONS_GRPC_URL: Joi.string().required(),
         WEATHER_GRPC_URL: Joi.string().required(),
         RABBITMQ_URL: Joi.string().required(),
       }),

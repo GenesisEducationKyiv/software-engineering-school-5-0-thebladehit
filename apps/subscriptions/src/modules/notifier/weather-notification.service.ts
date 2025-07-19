@@ -1,8 +1,12 @@
+import {
+  AbstractEventBus,
+  DailyForecastEvent,
+  HourlyForecastEvent,
+} from '@app/common/event-bus';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 
-import { AbstractNotificationsService } from '../notifications/abstracts/notifications.abstract';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { SubscriptionWithUserAndCity } from '../subscriptions/types/subscription-with-user-city';
 import { AbstractWeatherService } from '../weather/abstracts/weather.abstract';
@@ -14,8 +18,8 @@ export class WeatherNotification {
   constructor(
     private readonly weatherService: AbstractWeatherService,
     private readonly subscriptionService: SubscriptionsService,
-    private readonly notificationsService: AbstractNotificationsService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly eventBus: AbstractEventBus
   ) {
     this.batchSize = this.configService.get<number>('BATCH_SIZE');
   }
@@ -40,11 +44,13 @@ export class WeatherNotification {
       const promises = subscriptions.map((sub) => {
         const forecast = forecasts[sub.city.name];
         if (!forecast) return;
-        return this.notificationsService.sendDailyForecast({
-          email: sub.user.email,
-          city: sub.city.name,
-          ...forecast,
-        });
+        return this.eventBus.publish(
+          new DailyForecastEvent({
+            email: sub.user.email,
+            city: sub.city.name,
+            ...forecast,
+          })
+        );
       });
 
       await Promise.allSettled(promises);
@@ -71,11 +77,13 @@ export class WeatherNotification {
       const promises = subscriptions.map((sub) => {
         const forecast = forecasts[sub.city.name];
         if (!forecast) return;
-        return this.notificationsService.sendHourlyForecast({
-          email: sub.user.email,
-          city: sub.city.name,
-          ...forecast,
-        });
+        return this.eventBus.publish(
+          new HourlyForecastEvent({
+            email: sub.user.email,
+            city: sub.city.name,
+            ...forecast,
+          })
+        );
       });
 
       await Promise.allSettled(promises);
