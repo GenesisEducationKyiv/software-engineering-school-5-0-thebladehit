@@ -6,9 +6,12 @@ import {
   SubscriptionConfirmedException,
   SubscriptionNotFoundException,
 } from '@app/common/errors';
+import {
+  AbstractEventBus,
+  SubscriptionCreatedEvent,
+} from '@app/common/event-bus';
 
 import { CityService } from '../../../apps/subscriptions/src/modules/city/city.service';
-import { AbstractNotificationsService } from '../../../apps/subscriptions/src/modules/notifications/abstracts/notifications.abstract';
 import { AbstractSubscriptionRepository } from '../../../apps/subscriptions/src/modules/subscriptions/abstracts/subscription.repository.abstract';
 import { SubscriptionsService } from '../../../apps/subscriptions/src/modules/subscriptions/subscriptions.service';
 
@@ -24,8 +27,8 @@ describe('SubscriptionsService', () => {
     deleteSubscription: jest.fn(),
   };
 
-  const mockedMailService = {
-    sendSubscriptionConfirmation: jest.fn(),
+  const mockedEventBus = {
+    publish: jest.fn(),
   };
 
   const mockedCityService = {
@@ -41,8 +44,8 @@ describe('SubscriptionsService', () => {
           useValue: mockedSubscriptionRepository,
         },
         {
-          provide: AbstractNotificationsService,
-          useValue: mockedMailService,
+          provide: AbstractEventBus,
+          useValue: mockedEventBus,
         },
         {
           provide: CityService,
@@ -92,14 +95,14 @@ describe('SubscriptionsService', () => {
       expect(
         mockedSubscriptionRepository.createSubscription
       ).toHaveBeenCalledWith(dto, 'cityId');
-      expect(
-        mockedMailService.sendSubscriptionConfirmation
-      ).toHaveBeenCalledWith({
-        email: dto.email,
-        city: dto.city,
-        frequency: dto.frequency,
-        token: id,
-      });
+      expect(mockedEventBus.publish).toHaveBeenCalledWith(
+        new SubscriptionCreatedEvent({
+          email: dto.email,
+          city: dto.city,
+          frequency: dto.frequency,
+          token: id,
+        })
+      );
     });
   });
 

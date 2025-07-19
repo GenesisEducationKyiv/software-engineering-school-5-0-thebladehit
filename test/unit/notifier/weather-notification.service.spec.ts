@@ -1,7 +1,8 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AbstractNotificationsService } from '../../../apps/subscriptions/src/modules/notifications/abstracts/notifications.abstract';
+import { AbstractEventBus } from '@app/common/event-bus';
+
 import { WeatherNotification } from '../../../apps/subscriptions/src/modules/notifier/weather-notification.service';
 import { SubscriptionsService } from '../../../apps/subscriptions/src/modules/subscriptions/subscriptions.service';
 import { SubscriptionWithUserAndCity } from '../../../apps/subscriptions/src/modules/subscriptions/types/subscription-with-user-city';
@@ -21,9 +22,8 @@ describe('WeatherNotificationService', () => {
     deleteSubscription: jest.fn(),
   };
 
-  const mockedMailService = {
-    sendDailyForecast: jest.fn(),
-    sendHourlyForecast: jest.fn(),
+  const mockedEventBus = {
+    publish: jest.fn(),
   };
 
   const mockedConfigService = {
@@ -43,8 +43,8 @@ describe('WeatherNotificationService', () => {
           useValue: mockedSubscriptionService,
         },
         {
-          provide: AbstractNotificationsService,
-          useValue: mockedMailService,
+          provide: AbstractEventBus,
+          useValue: mockedEventBus,
         },
         {
           provide: ConfigService,
@@ -84,13 +84,10 @@ describe('WeatherNotificationService', () => {
         subscribers as unknown as SubscriptionWithUserAndCity[]
       );
       mockedWeatherService.getDailyForecasts.mockResolvedValue(forecast);
-      mockedMailService.sendDailyForecast.mockResolvedValue(undefined);
 
       await service.notifyDailySubscribers();
 
-      expect(mockedMailService.sendDailyForecast).toHaveBeenCalledTimes(
-        subscribers.length
-      );
+      expect(mockedEventBus.publish).toHaveBeenCalledTimes(subscribers.length);
     });
   });
 
@@ -113,13 +110,10 @@ describe('WeatherNotificationService', () => {
         subscribers as unknown as SubscriptionWithUserAndCity[]
       );
       mockedWeatherService.getHourlyForecasts.mockResolvedValue(forecast);
-      mockedMailService.sendHourlyForecast.mockResolvedValue(undefined);
 
       await service.notifyHourlySubscribers();
 
-      expect(mockedMailService.sendHourlyForecast).toHaveBeenCalledTimes(
-        subscribers.length
-      );
+      expect(mockedEventBus.publish).toHaveBeenCalledTimes(subscribers.length);
     });
   });
 });
