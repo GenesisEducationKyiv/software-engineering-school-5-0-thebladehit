@@ -2,8 +2,11 @@ import { join } from 'path';
 
 import {
   AbstractEventBus,
-  Event, EventBusModule,
+  DailyForecastEvent,
+  Event,
+  EventBusModule,
   EventTypes,
+  HourlyForecastEvent,
   SubscriptionCreatedEvent,
 } from '@app/common/event-bus';
 import { HealthModule } from '@app/common/health';
@@ -13,6 +16,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import Joi from 'joi';
 
+import { DailyForecastHandler } from './handlers/daily-forecast.handler';
+import { HourlyForecastHandler } from './handlers/hourly-forecast.handler';
 import { SubscriptionCreatedHandler } from './handlers/subscription-created.handler';
 import { MailService } from './mail.service';
 import { NotificationController } from './notification.controller';
@@ -27,7 +32,7 @@ import { NotificationController } from './notification.controller';
         SMTP_USERNAME: Joi.string().required(),
         SMTP_PASSWORD: Joi.string().required(),
         BACK_BASE_URL: Joi.string().required(),
-        GRPC_URL: Joi.string().required(),
+        // GRPC_URL: Joi.string().required(),
         RABBITMQ_URL: Joi.string().required(),
       }),
     }),
@@ -60,12 +65,19 @@ import { NotificationController } from './notification.controller';
     EventBusModule,
   ],
   controllers: [NotificationController],
-  providers: [MailService, SubscriptionCreatedHandler],
+  providers: [
+    MailService,
+    SubscriptionCreatedHandler,
+    DailyForecastHandler,
+    HourlyForecastHandler,
+  ],
 })
 export class NotificationModule implements OnModuleInit {
   constructor(
     private readonly eventBus: AbstractEventBus,
-    private readonly subscriptionCreatedHandler: SubscriptionCreatedHandler
+    private readonly subscriptionCreatedHandler: SubscriptionCreatedHandler,
+    private readonly dailyForecastHandler: DailyForecastHandler,
+    private readonly hourlyForecastHandler: HourlyForecastHandler
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -75,6 +87,18 @@ export class NotificationModule implements OnModuleInit {
         this.subscriptionCreatedHandler.handle(
           event as SubscriptionCreatedEvent
         );
+      }
+    );
+    await this.eventBus.subscribe(
+      EventTypes.DAILY_FORECAST,
+      async (event: Event): Promise<void> => {
+        this.dailyForecastHandler.handle(event as DailyForecastEvent);
+      }
+    );
+    await this.eventBus.subscribe(
+      EventTypes.HOURLY_FORECAST,
+      async (event: Event): Promise<void> => {
+        this.hourlyForecastHandler.handle(event as HourlyForecastEvent);
       }
     );
   }
