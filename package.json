@@ -11,9 +11,8 @@
   ],
   "scripts": {
     "build": "nest build",
-    "postbuild": "mkdir -p dist/libs/common/src/proto & cp libs/common/src/proto/**/*.proto dist/libs/common/src/proto",
+    "copy:proto": "mkdir -p dist/libs/common/src/proto && cp libs/common/src/proto/**/*.proto dist/libs/common/src/proto",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
-    "prestart": "mkdir -p dist/libs/common/src/proto & cp libs/common/src/proto/**/*.proto dist/libs/common/src/proto",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
