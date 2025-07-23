@@ -27,7 +27,7 @@ COPY --chown=node:node /apps/subscriptions/package.json ./apps/subscriptions/pac
 RUN npm ci --omit=dev
 COPY --chown=node:node --from=build /usr/src/app/dist/apps/subscriptions /usr/src/app/dist/apps/subscriptions
 COPY --chown=node:node --from=build /usr/src/app/dist/libs /usr/src/app/dist/libs
-COPY --chown=node:node /apps/subscriptions/src/prisma/schema.prisma ./
+COPY --chown=node:node /apps/subscriptions/src/prisma ./
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["node", "dist/apps/subscriptions/main.js"]
