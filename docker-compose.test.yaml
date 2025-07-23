@@ -5,7 +5,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/weather/Dockerfile
-      target: development
     restart: always
     ports:
       - "3001:3001"
@@ -14,7 +13,6 @@ services:
     environment:
       PORT: 3011
       GRPC_URL: "0.0.0.0:3001"
-    command: npm run start weather
     depends_on:
       redis:
         condition: service_healthy
@@ -25,7 +23,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/notifications/Dockerfile
-      target: development
     restart: always
     ports:
       - "3002:3002"
@@ -34,16 +31,16 @@ services:
     environment:
       PORT: 3012
       GRPC_URL: "0.0.0.0:3002"
-    command: npm run start notifications
     depends_on:
       mailhog:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   subscriptions:
     build:
       context: .
       dockerfile: ./apps/subscriptions/Dockerfile
-      target: development
     restart: always
     ports:
       - "3000:3000"
@@ -54,7 +51,7 @@ services:
       PORT: 3010
       GRPC_URL: "0.0.0.0:3000"
       DATABASE_URL: "postgresql://postgres:1111@postgres:5432/weather?schema=public"
-    command: [ "sh", "-c", "npx prisma generate --schema=apps/subscriptions/src/prisma && npx prisma migrate deploy --schema=apps/subscriptions/src/prisma && npm run start subscriptions" ]
+    command: ["sh", "-c", "npx prisma migrate deploy && npx prisma generate && node dist/apps/subscriptions/main.js"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,12 +61,13 @@ services:
         condition: service_started
       mock-server:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   gateway:
     build:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
-      target: development
     restart: always
     ports:
       - "3003:3003"
@@ -77,7 +75,6 @@ services:
       - .env.test
     environment:
       PORT: 3003
-    command: npm run start gateway
     depends_on:
       subscriptions:
         condition: service_started
@@ -125,6 +122,11 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
       - rabbitmq_data:/data
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mailhog:
     image: mailhog/mailhog:latest
