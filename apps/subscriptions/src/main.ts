@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-import { winstonConfig } from '@app/common/logger';
+import { createWinstonConfig } from '@app/common/logger';
 import { SUBSCRIPTIONS_PACKAGE_NAME } from '@app/common/proto/subscriptions';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -11,7 +11,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
-    logger: WinstonModule.createLogger(winstonConfig),
+    logger: WinstonModule.createLogger(createWinstonConfig('Subscriptions')),
   });
   const configService = app.get(ConfigService);
   app.connectMicroservice<MicroserviceOptions>({
