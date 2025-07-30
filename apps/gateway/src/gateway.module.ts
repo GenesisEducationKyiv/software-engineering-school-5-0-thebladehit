@@ -8,6 +8,7 @@ import * as Joi from 'joi';
 
 import { HealthModule } from '@app/common/health';
 import { DurationInterceptor } from '@app/common/interceptors';
+import { MetricsModule } from '@app/common/metrics';
 
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { WeatherModule } from './modules/weather/weather.module';
@@ -31,6 +32,7 @@ import { WeatherModule } from './modules/weather/weather.module';
     SubscriptionsModule,
     WeatherModule,
     HealthModule,
+    MetricsModule,
   ],
   providers: [
     {
