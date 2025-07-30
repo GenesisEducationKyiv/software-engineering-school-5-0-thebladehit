@@ -3,16 +3,15 @@ import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { WinstonModule } from 'nest-winston';
 
-import { createWinstonConfig } from '@app/common/logger';
+import { SamplingLogger } from '@app/common/logger';
 import { WEATHER_PACKAGE_NAME } from '@app/common/proto/weather';
 
 import { WeatherModule } from './modules/weather/weather.module';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(WeatherModule, {
-    logger: WinstonModule.createLogger(createWinstonConfig('Weather')),
+    logger: new SamplingLogger('Weather'),
   });
   const configService = app.get(ConfigService);
   app.connectMicroservice<MicroserviceOptions>({
