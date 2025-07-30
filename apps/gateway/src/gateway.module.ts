@@ -2,10 +2,12 @@ import { resolve } from 'path';
 
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import * as Joi from 'joi';
 
 import { HealthModule } from '@app/common/health';
+import { DurationInterceptor } from '@app/common/interceptors';
 
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { WeatherModule } from './modules/weather/weather.module';
@@ -29,6 +31,12 @@ import { WeatherModule } from './modules/weather/weather.module';
     SubscriptionsModule,
     WeatherModule,
     HealthModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DurationInterceptor,
+    },
   ],
 })
 export class GatewayModule {}

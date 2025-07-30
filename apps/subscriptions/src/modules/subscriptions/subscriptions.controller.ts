@@ -1,3 +1,4 @@
+import { DurationInterceptor } from '@app/common/interceptors';
 import {
   CreateSubscriptionRequest,
   Empty,
@@ -7,10 +8,11 @@ import {
 } from '@app/common/proto/subscriptions';
 import { CreateSubscriptionDto } from '@app/common/types';
 import { mapGrpcError, validateAndGetDto } from '@app/common/utils';
-import { Controller } from '@nestjs/common';
+import { Controller, UseInterceptors } from '@nestjs/common';
 
 import { SubscriptionsService } from './subscriptions.service';
 
+@UseInterceptors(DurationInterceptor)
 @Controller()
 @SubscriptionsServiceControllerMethods()
 export class SubscriptionsController implements SubscriptionsServiceController {
