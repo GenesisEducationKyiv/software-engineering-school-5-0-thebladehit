@@ -15,10 +15,13 @@ import {
 } from '@app/common/types';
 
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
+import { AbstractWeatherMetricsService } from '../metrics/abstracts/weather-metrics.service.abstract';
 
 import { ErrorResponseDto } from './dto/error-response.dto';
 import { ForecastResponseDto } from './dto/forecast-response.dto';
 import { CurrentWeatherDto } from './dto/weather-response.dto';
+
+const providerName = 'OpenWeather.com';
 
 // this service implementation use openweathermap.com
 @Injectable()
@@ -29,7 +32,8 @@ export class OpenWeatherService implements AbstractWeatherApiService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
+    private readonly metricsService: AbstractWeatherMetricsService
   ) {
     this.apiKey = this.configService.getOrThrow<string>('OPEN_WEATHER_API_KEY');
     this.baseURL = this.configService.get<string>('OPEN_WEATHER_BASE_URL');
@@ -108,6 +112,7 @@ export class OpenWeatherService implements AbstractWeatherApiService {
     url: string,
     city: string
   ): Promise<T> {
+    this.metricsService.incExternalRequests(providerName);
     return firstValueFrom(
       this.httpService.get<T>(url).pipe(
         map((response) => response.data),

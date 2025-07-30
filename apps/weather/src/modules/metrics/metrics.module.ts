@@ -4,7 +4,11 @@ import { makeCounterProvider } from '@willsoto/nestjs-prometheus';
 import { MetricsModule as CommonMetricsModule } from '@app/common/metrics';
 
 import { AbstractWeatherMetricsService } from './abstracts/weather-metrics.service.abstract';
-import { DATA_FROM_API, DATA_FROM_REDIS_CACHE } from './constants/metric-names';
+import {
+  DATA_FROM_API,
+  DATA_FROM_REDIS_CACHE,
+  EXTERNAL_REQUESTS_TOTAL,
+} from './constants/metric-names';
 import { WeatherMetricsService } from './weather-metrics.service';
 
 @Module({
@@ -21,6 +25,11 @@ import { WeatherMetricsService } from './weather-metrics.service';
     makeCounterProvider({
       name: DATA_FROM_API,
       help: 'Data gotten from external api',
+    }),
+    makeCounterProvider({
+      name: EXTERNAL_REQUESTS_TOTAL,
+      help: 'The total external requests count',
+      labelNames: ['provider'],
     }),
   ],
   exports: [AbstractWeatherMetricsService],
