@@ -6,8 +6,11 @@ import { AxiosError } from 'axios';
 import { catchError, firstValueFrom } from 'rxjs';
 
 import { AbstractCityApiService } from '../../abstracts/city-api.abstract';
+import { AbstractSubscriptionMetricsService } from '../metrics/abstracts/metrics.service.abstract';
 
 import { ErrorResponseDto } from './dto/error-response.dto';
+
+const providerName = 'OpenWeather.com';
 
 @Injectable()
 export class CityOpenWeatherService implements AbstractCityApiService {
@@ -17,7 +20,8 @@ export class CityOpenWeatherService implements AbstractCityApiService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
+    private readonly metricsService: AbstractSubscriptionMetricsService
   ) {
     this.apiKey = this.configService.getOrThrow<string>('OPEN_WEATHER_API_KEY');
     this.baseURL = this.configService.get<string>('OPEN_WEATHER_BASE_URL');
@@ -26,6 +30,7 @@ export class CityOpenWeatherService implements AbstractCityApiService {
   async isCityExists(name: string): Promise<boolean> {
     try {
       const url = `${this.baseURL}/weather?appid=${this.apiKey}&q=${encodeURIComponent(name)}`;
+      this.metricsService.incExternalRequest(providerName);
       const result = await firstValueFrom(
         this.httpService.get(url).pipe(
           catchError((error: AxiosError<ErrorResponseDto>) => {

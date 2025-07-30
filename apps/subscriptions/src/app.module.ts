@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
+import { MetricsModule } from './modules/metrics/metrics.module';
 import { NotifierModule } from './modules/notifier/notifier.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 
@@ -26,6 +27,7 @@ import { SubscriptionsModule } from './modules/subscriptions/subscriptions.modul
     SubscriptionsModule,
     NotifierModule,
     HealthModule,
+    MetricsModule,
   ],
 })
 export class AppModule {}
