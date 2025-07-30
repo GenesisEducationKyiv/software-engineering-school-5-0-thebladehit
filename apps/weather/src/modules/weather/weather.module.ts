@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 
 import { HealthModule } from '@app/common/health';
+import { MetricsModule as CommonMetricsModule } from '@app/common/metrics';
 
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
 import { MetricsModule } from '../metrics/metrics.module';
@@ -48,6 +49,7 @@ import { WeatherService } from './weather.service';
     }),
     WeatherApiModule,
     OpenWeatherModule,
+    CommonMetricsModule,
     MetricsModule,
     HealthModule,
   ],

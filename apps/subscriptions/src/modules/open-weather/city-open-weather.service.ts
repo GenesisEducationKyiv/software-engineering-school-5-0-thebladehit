@@ -29,7 +29,7 @@ export class CityOpenWeatherService implements AbstractCityApiService {
       const result = await firstValueFrom(
         this.httpService.get(url).pipe(
           catchError((error: AxiosError<ErrorResponseDto>) => {
-            this.logger.error(error.response?.data);
+            this.logger.warn(error.response?.data);
             const errorCode = error.response?.data?.cod;
             if (Number(errorCode) === 404) {
               throw new CityNotFoundException(name);
@@ -38,7 +38,7 @@ export class CityOpenWeatherService implements AbstractCityApiService {
           })
         )
       );
-      this.logger.log(result.data);
+      this.logger.log(JSON.stringify(result.data));
       return true;
     } catch (err) {
       if (err instanceof CityNotFoundException) {

@@ -3,12 +3,14 @@ import {
   SendDailyForecastMailDto,
   SendHourlyForecastMailDto,
 } from '@app/common/types';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class MailService {
+  private readonly logger = new Logger(MailService.name);
+
   constructor(
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService
@@ -20,37 +22,52 @@ export class MailService {
     city,
     frequency,
   }: SendConfirmationMailDto): Promise<void> {
-    const urlConfirm = `${this.configService.get('BACK_BASE_URL')}/subscriptions/confirm/${token}`;
-    const urlUnsubscribe = `${this.configService.get('BACK_BASE_URL')}/subscriptions/unsubscribe/${token}`;
+    try {
+      const urlConfirm = `${this.configService.get('BACK_BASE_URL')}/subscriptions/confirm/${token}`;
+      const urlUnsubscribe = `${this.configService.get('BACK_BASE_URL')}/subscriptions/unsubscribe/${token}`;
 
-    await this.mailerService.sendMail({
-      to: email,
-      subject: 'Your subscription is created! Confirm it',
-      template: './confirmation',
-      context: {
-        city,
-        frequency,
-        urlConfirm,
-        urlUnsubscribe,
-      },
-    });
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Your subscription is created! Confirm it',
+        template: './confirmation',
+        context: {
+          city,
+          frequency,
+          urlConfirm,
+          urlUnsubscribe,
+        },
+      });
+      this.logger.log(`Sent confirmation email to ${email}`);
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 
   async sendDailyForecast(dto: SendDailyForecastMailDto): Promise<void> {
-    await this.mailerService.sendMail({
-      to: dto.email,
-      subject: `Daily Forecast for ${dto.city}`,
-      template: './daily-forecast',
-      context: dto,
-    });
+    try {
+      await this.mailerService.sendMail({
+        to: dto.email,
+        subject: `Daily Forecast for ${dto.city}`,
+        template: './daily-forecast',
+        context: dto,
+      });
+      this.logger.log(`Sent daily forecast email to ${dto.email}`);
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 
   async sendHourlyForecast(dto: SendHourlyForecastMailDto): Promise<void> {
-    await this.mailerService.sendMail({
-      to: dto.email,
-      subject: `Hourly Forecast for ${dto.city}`,
-      template: './hourly-forecast',
-      context: dto,
-    });
+    try {
+      await this.mailerService.sendMail({
+        to: dto.email,
+        subject: `Hourly Forecast for ${dto.city}`,
+        template: './hourly-forecast',
+        context: dto,
+      });
+      this.logger.log(`Sent hourly forecast email to ${dto.email}`);
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 }

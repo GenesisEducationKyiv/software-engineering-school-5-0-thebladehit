@@ -1,4 +1,4 @@
-import { Controller, UseInterceptors } from '@nestjs/common';
+import { Controller, Logger, UseInterceptors } from '@nestjs/common';
 
 import {
   DurationInterceptor,
@@ -23,6 +23,8 @@ import { WeatherService } from './weather.service';
 @Controller()
 @WeatherServiceControllerMethods()
 export class WeatherController implements WeatherServiceController {
+  private readonly logger = new Logger(WeatherController.name);
+
   constructor(private readonly weatherService: WeatherService) {}
 
   async getWeather(query: CityRequest): Promise<WeatherResponse> {
@@ -30,6 +32,7 @@ export class WeatherController implements WeatherServiceController {
       const dto = await validateAndGetDto(CityQueryDto, query);
       return await this.weatherService.getWeather(dto.city);
     } catch (err) {
+      this.logger.error(err);
       mapGrpcError(err);
     }
   }
@@ -42,6 +45,7 @@ export class WeatherController implements WeatherServiceController {
       );
       return { forecasts: dailyForecasts };
     } catch (err) {
+      this.logger.error(err);
       mapGrpcError(err);
     }
   }
@@ -56,6 +60,7 @@ export class WeatherController implements WeatherServiceController {
       );
       return { forecasts: hourlyForecasts };
     } catch (err) {
+      this.logger.error(err);
       mapGrpcError(err);
     }
   }

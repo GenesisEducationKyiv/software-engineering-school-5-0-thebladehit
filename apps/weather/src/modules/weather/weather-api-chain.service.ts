@@ -29,7 +29,7 @@ export class WeatherApiChainService implements AbstractWeatherApiService {
     try {
       return await this.providerChain.getDailyForecast(city);
     } catch (err) {
-      this.logger.error(
+      this.logger.warn(
         `Unable to get Daily Forecast for city: ${city} from all providers`
       );
       throw err;
@@ -40,7 +40,7 @@ export class WeatherApiChainService implements AbstractWeatherApiService {
     try {
       return await this.providerChain.getHourlyForecast(city);
     } catch (err) {
-      this.logger.error(
+      this.logger.warn(
         `Unable to get Hourly Forecast for city: ${city} from all providers`
       );
       throw err;
@@ -51,7 +51,7 @@ export class WeatherApiChainService implements AbstractWeatherApiService {
     try {
       return await this.providerChain.getWeather(city);
     } catch (err) {
-      this.logger.error(
+      this.logger.warn(
         `Unable to get Weather for city: ${city} from all providers`
       );
       throw err;

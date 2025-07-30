@@ -41,7 +41,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
       url,
       city
     );
-    this.logger.log(response);
+    this.logger.log(JSON.stringify(response));
     return {
       temperature: response.current.temp_c,
       humidity: response.current.humidity,
@@ -55,7 +55,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
       url,
       city
     );
-    this.logger.log(response);
+    this.logger.log(JSON.stringify(response));
     const dayForecast = response.forecast.forecastday[0];
     if (!dayForecast) {
       throw new InvalidExternalResponseError(this.baseURL);
@@ -79,7 +79,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
       url,
       city
     );
-    this.logger.log(response);
+    this.logger.log(JSON.stringify(response));
     const dayForecast = response.forecast.forecastday[0];
     if (!dayForecast || !dayForecast.hour[0]) {
       throw new InvalidExternalResponseError(this.baseURL);
@@ -103,6 +103,7 @@ export class WeatherAPIService implements AbstractWeatherApiService {
         map((response) => response.data),
         catchError((error) => {
           const data = error?.response?.data as ErrorResponse;
+          this.logger.warn(JSON.stringify(data));
           if (data?.error?.code === 1006) {
             throw new CityNotFoundException(city);
           }

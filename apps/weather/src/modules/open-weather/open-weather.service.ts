@@ -41,7 +41,7 @@ export class OpenWeatherService implements AbstractWeatherApiService {
       url,
       city
     );
-    this.logger.log(response);
+    this.logger.log(JSON.stringify(response));
     const weatherInfo = response.weather[0];
     if (!weatherInfo) {
       throw new InvalidExternalResponseError(this.baseURL);
@@ -59,7 +59,7 @@ export class OpenWeatherService implements AbstractWeatherApiService {
       url,
       city
     );
-    this.logger.log(response);
+    this.logger.log(JSON.stringify(response));
     const hourForecasts = response.list;
     if (hourForecasts.length === 0) {
       throw new InvalidExternalResponseError(this.baseURL);
@@ -86,7 +86,7 @@ export class OpenWeatherService implements AbstractWeatherApiService {
       url,
       city
     );
-    this.logger.log(response);
+    this.logger.log(JSON.stringify(response));
     const hourForecast = response.list[0];
     if (!hourForecast) {
       throw new InvalidExternalResponseError(this.baseURL);
@@ -113,6 +113,7 @@ export class OpenWeatherService implements AbstractWeatherApiService {
         map((response) => response.data),
         catchError((error) => {
           const data = error?.response?.data as ErrorResponseDto;
+          this.logger.warn(JSON.stringify(data));
           if (Number(data.cod) === 404) {
             throw new CityNotFoundException(city);
           }
