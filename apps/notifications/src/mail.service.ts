@@ -7,13 +7,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 
+import { AbstractNotificationMetricsService } from './metrics/abstracts/metrics.service.abstract';
+import { EmailStatus } from './metrics/constants/email-status';
+
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
 
   constructor(
     private readonly mailerService: MailerService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly metricsService: AbstractNotificationMetricsService
   ) {}
 
   async sendSubscriptionConfirmation({
@@ -38,8 +42,16 @@ export class MailService {
         },
       });
       this.logger.log(`Sent confirmation email to ${email}`);
+      this.metricsService.incEmailSent(
+        EmailStatus.SENT,
+        this.sendSubscriptionConfirmation.name
+      );
     } catch (err) {
       this.logger.error(err);
+      this.metricsService.incEmailSent(
+        EmailStatus.ERROR,
+        this.sendSubscriptionConfirmation.name
+      );
     }
   }
 
@@ -52,8 +64,16 @@ export class MailService {
         context: dto,
       });
       this.logger.log(`Sent daily forecast email to ${dto.email}`);
+      this.metricsService.incEmailSent(
+        EmailStatus.SENT,
+        this.sendDailyForecast.name
+      );
     } catch (err) {
       this.logger.error(err);
+      this.metricsService.incEmailSent(
+        EmailStatus.ERROR,
+        this.sendDailyForecast.name
+      );
     }
   }
 
@@ -66,8 +86,16 @@ export class MailService {
         context: dto,
       });
       this.logger.log(`Sent hourly forecast email to ${dto.email}`);
+      this.metricsService.incEmailSent(
+        EmailStatus.SENT,
+        this.sendHourlyForecast.name
+      );
     } catch (err) {
       this.logger.error(err);
+      this.metricsService.incEmailSent(
+        EmailStatus.ERROR,
+        this.sendHourlyForecast.name
+      );
     }
   }
 }

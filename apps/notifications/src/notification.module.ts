@@ -20,6 +20,7 @@ import { DailyForecastHandler } from './handlers/daily-forecast.handler';
 import { HourlyForecastHandler } from './handlers/hourly-forecast.handler';
 import { SubscriptionCreatedHandler } from './handlers/subscription-created.handler';
 import { MailService } from './mail.service';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { MailService } from './mail.service';
     }),
     HealthModule,
     EventBusModule,
+    MetricsModule,
   ],
   providers: [
     MailService,
