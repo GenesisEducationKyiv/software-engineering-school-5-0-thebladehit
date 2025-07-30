@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import { CityOpenWeatherProvider } from '../../apps/subscriptions/src/modules/city/chain-providers/city-open-weather.provider';
 import { CityWeatherApiProvider } from '../../apps/subscriptions/src/modules/city/chain-providers/city-weather-api.provider';
 import { CityApiChainService } from '../../apps/subscriptions/src/modules/city/city-api-chain.service';
+import { MetricsModule } from '../../apps/subscriptions/src/modules/metrics/metrics.module';
 import { CityOpenWeatherService } from '../../apps/subscriptions/src/modules/open-weather/city-open-weather.service';
 import { CityWeatherApiService } from '../../apps/subscriptions/src/modules/weather-api/city-weather-api.service';
 
@@ -25,6 +26,7 @@ describe('CityApiChainService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [MetricsModule],
       providers: [
         CityApiChainService,
         CityWeatherApiProvider,

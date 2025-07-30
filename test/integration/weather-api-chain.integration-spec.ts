@@ -4,6 +4,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
 
 import { CityNotFoundException } from '@app/common/errors';
+
+import { MetricsModule } from '../../apps/weather/src/modules/metrics/metrics.module';
 import { OpenWeatherService } from '../../apps/weather/src/modules/open-weather/open-weather.service';
 import { OpenWeatherProvider } from '../../apps/weather/src/modules/weather/chain-providers/open-weather.provider';
 import { WeatherApiProvider } from '../../apps/weather/src/modules/weather/chain-providers/weather-api.provider';
@@ -26,6 +28,7 @@ describe('WeatherApiChainService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [MetricsModule],
       providers: [
         WeatherAPIService,
         OpenWeatherService,

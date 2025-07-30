@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 
 import { UnexpectedError } from '@app/common/errors';
 
+import { MetricsModule } from '../../../apps/subscriptions/src/modules/metrics/metrics.module';
 import { CityWeatherApiService } from '../../../apps/subscriptions/src/modules/weather-api/city-weather-api.service';
 
 describe('CityWeatherApiService', () => {
@@ -21,6 +22,7 @@ describe('CityWeatherApiService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [MetricsModule],
       providers: [
         CityWeatherApiService,
         {
