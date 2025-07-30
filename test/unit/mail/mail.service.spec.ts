@@ -10,6 +10,7 @@ import {
 } from '@app/common/types';
 
 import { MailService } from '../../../apps/notifications/src/mail.service';
+import { MetricsModule } from '../../../apps/notifications/src/metrics/metrics.module';
 
 const fakeAPIUrl = 'http://fake-api.com';
 
@@ -29,6 +30,7 @@ describe('MailServiceImpl', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [MetricsModule],
       providers: [
         MailService,
         {

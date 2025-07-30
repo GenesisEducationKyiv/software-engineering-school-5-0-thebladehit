@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
 
+import { MetricsModule } from '../../../apps/weather/src/modules/metrics/metrics.module';
 import { OpenWeatherService } from '../../../apps/weather/src/modules/open-weather/open-weather.service';
 
 describe('OpenWeatherService', () => {
@@ -23,6 +24,7 @@ describe('OpenWeatherService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [MetricsModule],
       providers: [
         OpenWeatherService,
         {
