@@ -11,7 +11,7 @@ import {
 } from '@app/common/proto/subscriptions';
 import { CreateSubscriptionDto } from '@app/common/types';
 import { mapGrpcError, validateAndGetDto } from '@app/common/utils';
-import { Controller, UseInterceptors } from '@nestjs/common';
+import { Controller, Logger, UseInterceptors } from '@nestjs/common';
 
 import { SubscriptionsService } from './subscriptions.service';
 
@@ -19,6 +19,8 @@ import { SubscriptionsService } from './subscriptions.service';
 @Controller()
 @SubscriptionsServiceControllerMethods()
 export class SubscriptionsController implements SubscriptionsServiceController {
+  private readonly logger = new Logger(SubscriptionsController.name);
+
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
   async createSubscription(query: CreateSubscriptionRequest): Promise<Empty> {
@@ -27,6 +29,7 @@ export class SubscriptionsController implements SubscriptionsServiceController {
       await this.subscriptionsService.createSubscription(dto);
       return {};
     } catch (err) {
+      this.logger.error(err);
       mapGrpcError(err);
     }
   }
@@ -36,6 +39,7 @@ export class SubscriptionsController implements SubscriptionsServiceController {
       await this.subscriptionsService.confirmSubscription(query.token);
       return {};
     } catch (err) {
+      this.logger.error(err);
       mapGrpcError(err);
     }
   }
@@ -45,6 +49,7 @@ export class SubscriptionsController implements SubscriptionsServiceController {
       await this.subscriptionsService.unsubscribeSubscription(query.token);
       return {};
     } catch (err) {
+      this.logger.error(err);
       mapGrpcError(err);
     }
   }

@@ -8,7 +8,7 @@ import {
 } from '@app/common/types';
 
 import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
-import { AbstractMetricsService } from '../metrics/abstracts/metrics.service.abstract';
+import { AbstractWeatherMetricsService } from '../metrics/abstracts/weather-metrics.service.abstract';
 
 import { AbstractWeatherCacheService } from './abstracts/weather-cache.service.abstract';
 
@@ -16,7 +16,7 @@ import { AbstractWeatherCacheService } from './abstracts/weather-cache.service.a
 export class WeatherService {
   constructor(
     private readonly weatherApiService: AbstractWeatherApiService,
-    private readonly metricService: AbstractMetricsService,
+    private readonly metricService: AbstractWeatherMetricsService,
     private readonly cache: AbstractWeatherCacheService
   ) {}
 

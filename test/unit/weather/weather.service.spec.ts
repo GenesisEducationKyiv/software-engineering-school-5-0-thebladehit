@@ -10,7 +10,7 @@ import {
 } from '@app/common/types';
 
 import { AbstractWeatherApiService } from '../../../apps/weather/src/abstracts/weather-api.abstract';
-import { AbstractMetricsService } from '../../../apps/weather/src/modules/metrics/abstracts/metrics.service.abstract';
+import { AbstractWeatherMetricsService } from '../../../apps/weather/src/modules/metrics/abstracts/weather-metrics.service.abstract';
 import { AbstractWeatherCacheService } from '../../../apps/weather/src/modules/weather/abstracts/weather-cache.service.abstract';
 import { WeatherService } from '../../../apps/weather/src/modules/weather/weather.service';
 
@@ -57,7 +57,7 @@ describe('WeatherService', () => {
           useValue: mockedWeatherCacheService,
         },
         {
-          provide: AbstractMetricsService,
+          provide: AbstractWeatherMetricsService,
           useValue: mockedMetricService,
         },
       ],
