@@ -8,6 +8,7 @@ services:
     restart: always
     ports:
       - "3001:3001"
+      - "3011:3011"
     env_file:
       - ./apps/weather/.env
     depends_on:
@@ -21,6 +22,7 @@ services:
     restart: always
     ports:
       - "3002:3002"
+      - "3012:3012"
     env_file:
       - ./apps/notifications/.env
     depends_on:
@@ -34,6 +36,7 @@ services:
     restart: always
     ports:
       - "3000:3000"
+      - "3010:3010"
     env_file:
       - ./apps/subscriptions/.env
     command: ["sh", "-c", "npx prisma migrate deploy && npx prisma generate && node dist/apps/subscriptions/main.js"]

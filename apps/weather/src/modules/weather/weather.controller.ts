@@ -1,6 +1,9 @@
 import { Controller, UseInterceptors } from '@nestjs/common';
 
-import { DurationInterceptor } from '@app/common/interceptors';
+import {
+  DurationInterceptor,
+  TotalRequestsInterceptor,
+} from '@app/common/interceptors';
 import {
   CitiesDailyForecast,
   CitiesHourlyForecast,
@@ -16,7 +19,7 @@ import { mapGrpcError, validateAndGetDto } from '@app/common/utils';
 import { ForecastsDto } from './dto/forecasts.dto';
 import { WeatherService } from './weather.service';
 
-@UseInterceptors(DurationInterceptor)
+@UseInterceptors(DurationInterceptor, TotalRequestsInterceptor)
 @Controller()
 @WeatherServiceControllerMethods()
 export class WeatherController implements WeatherServiceController {

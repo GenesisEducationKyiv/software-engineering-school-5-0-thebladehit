@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
-import {
-  makeCounterProvider,
-  PrometheusModule,
-} from '@willsoto/nestjs-prometheus';
+import { makeCounterProvider } from '@willsoto/nestjs-prometheus';
+
+import { MetricsModule as CommonMetricsModule } from '@app/common/metrics';
 
 import { AbstractMetricsService } from './abstracts/metrics.service.abstract';
 import { DATA_FROM_API, DATA_FROM_REDIS_CACHE } from './constants/metric-names';
 import { MetricsService } from './metrics.service';
 
 @Module({
-  imports: [PrometheusModule.register()],
+  imports: [CommonMetricsModule],
   providers: [
     {
       provide: AbstractMetricsService,
