@@ -1,0 +1,176 @@
+import { HttpService } from '@nestjs/axios';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { catchError, firstValueFrom, map } from 'rxjs';
+
+import {
+  CityNotFoundException,
+  InvalidExternalResponseError,
+  UnexpectedError,
+} from '@app/common/errors';
+import {
+  WeatherDailyForecastDto,
+  WeatherHourlyForecastDto,
+  WeatherResponseDto,
+} from '@app/common/types';
+
+import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
+import { AbstractWeatherMetricsService } from '../metrics/abstracts/weather-metrics.service.abstract';
+
+import { ErrorResponseDto } from './dto/error-response.dto';
+import { ForecastResponseDto } from './dto/forecast-response.dto';
+import { CurrentWeatherDto } from './dto/weather-response.dto';
+
+const providerName = 'OpenWeather.com';
+
+// this service implementation use openweathermap.com
+@Injectable()
+export class OpenWeatherService implements AbstractWeatherApiService {
+  private readonly baseURL: string;
+  private readonly apiKey: string;
+  private readonly logger = new Logger(OpenWeatherService.name);
+
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService,
+    private readonly metricsService: AbstractWeatherMetricsService
+  ) {
+    this.apiKey = this.configService.getOrThrow<string>('OPEN_WEATHER_API_KEY');
+    this.baseURL = this.configService.get<string>('OPEN_WEATHER_BASE_URL');
+  }
+
+  async getWeather(city: string): Promise<WeatherResponseDto> {
+    const url = `${this.baseURL}/weather?appid=${this.apiKey}&q=${encodeURIComponent(city)}&units=metric`;
+    const response = await this.fetchWeatherDataFromAPI<CurrentWeatherDto>(
+      url,
+      city
+    );
+    this.logger.log(JSON.stringify(response));
+    const weatherInfo = response.weather[0];
+    if (!weatherInfo) {
+      throw new InvalidExternalResponseError(this.baseURL);
+    }
+    return {
+      temperature: response.main.temp,
+      humidity: response.main.humidity,
+      description: weatherInfo.description,
+    };
+  }
+
+  async getDailyForecast(city: string): Promise<WeatherDailyForecastDto> {
+    const url = `${this.baseURL}/forecast?appid=${this.apiKey}&q=${encodeURIComponent(city)}&units=metric&cnt=8`;
+    const response = await this.fetchWeatherDataFromAPI<ForecastResponseDto>(
+      url,
+      city
+    );
+    this.logger.log(JSON.stringify(response));
+    const hourForecasts = response.list;
+    if (hourForecasts.length === 0) {
+      throw new InvalidExternalResponseError(this.baseURL);
+    }
+    const weatherInfo = hourForecasts[0].weather[0];
+    if (!weatherInfo) {
+      throw new InvalidExternalResponseError(this.baseURL);
+    }
+    return {
+      maxTemp: this.getMaxTemp(hourForecasts),
+      minTemp: this.getMinTemp(hourForecasts),
+      avgTemp: this.getAvgTemp(hourForecasts),
+      avgHumidity: this.getAvgHumidity(hourForecasts),
+      chanceOfRain: this.getDailyChanceOfRain(hourForecasts),
+      description: weatherInfo.description,
+      sunrise: new Date(response.city.sunrise).toISOString(),
+      sunset: new Date(response.city.sunset).toISOString(),
+    };
+  }
+
+  async getHourlyForecast(city: string): Promise<WeatherHourlyForecastDto> {
+    const url = `${this.baseURL}/forecast?appid=${this.apiKey}&q=${encodeURIComponent(city)}&cnt=1&units=metric`;
+    const response = await this.fetchWeatherDataFromAPI<ForecastResponseDto>(
+      url,
+      city
+    );
+    this.logger.log(JSON.stringify(response));
+    const hourForecast = response.list[0];
+    if (!hourForecast) {
+      throw new InvalidExternalResponseError(this.baseURL);
+    }
+    const weatherInfo = hourForecast.weather[0];
+    if (!weatherInfo) {
+      throw new InvalidExternalResponseError(this.baseURL);
+    }
+    return {
+      temp: hourForecast.main.temp,
+      description: weatherInfo.description,
+      feelsLikeTemp: hourForecast.main.feels_like,
+      humidity: hourForecast.main.humidity,
+      chanceOfRain: hourForecast.pop,
+    };
+  }
+
+  private async fetchWeatherDataFromAPI<T>(
+    url: string,
+    city: string
+  ): Promise<T> {
+    this.metricsService.incExternalRequests(providerName);
+    return firstValueFrom(
+      this.httpService.get<T>(url).pipe(
+        map((response) => response.data),
+        catchError((error) => {
+          const data = error?.response?.data as ErrorResponseDto;
+          this.logger.warn(JSON.stringify(data));
+          if (Number(data.cod) === 404) {
+            throw new CityNotFoundException(city);
+          }
+          throw new UnexpectedError();
+        })
+      )
+    );
+  }
+
+  private getMaxTemp(forecasts: CurrentWeatherDto[]): number {
+    let maxTemp = 0;
+    for (const forecast of forecasts) {
+      const curTemp = forecast.main.temp;
+      if (curTemp > maxTemp) {
+        maxTemp = curTemp;
+      }
+    }
+    return maxTemp;
+  }
+
+  private getMinTemp(forecasts: CurrentWeatherDto[]): number {
+    let minTemp = Infinity;
+    for (const forecast of forecasts) {
+      const curTemp = forecast.main.temp;
+      if (curTemp < minTemp) {
+        minTemp = curTemp;
+      }
+    }
+    return minTemp;
+  }
+
+  private getAvgTemp(forecasts: CurrentWeatherDto[]): number {
+    let avgTemp = 0;
+    for (const forecast of forecasts) {
+      avgTemp += forecast.main.temp;
+    }
+    return avgTemp / forecasts.length;
+  }
+
+  private getAvgHumidity(forecasts: CurrentWeatherDto[]): number {
+    let avgHumidity = 0;
+    for (const forecast of forecasts) {
+      avgHumidity += forecast.main.humidity;
+    }
+    return avgHumidity / forecasts.length;
+  }
+
+  private getDailyChanceOfRain(forecasts: CurrentWeatherDto[]): number {
+    let chanceOfNoRain = 1;
+    for (const forecast of forecasts) {
+      chanceOfNoRain *= 1 - forecast.pop;
+    }
+    return 1 - chanceOfNoRain;
+  }
+}

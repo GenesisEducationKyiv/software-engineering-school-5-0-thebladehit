@@ -1,0 +1,92 @@
+import { Injectable } from '@nestjs/common';
+
+import { CityNotFoundException } from '@app/common/errors';
+import {
+  CitiesDailyForecastDto,
+  CitiesHourlyForecastDto,
+  WeatherResponseDto,
+} from '@app/common/types';
+
+import { AbstractWeatherApiService } from '../../abstracts/weather-api.abstract';
+import { AbstractWeatherMetricsService } from '../metrics/abstracts/weather-metrics.service.abstract';
+
+import { AbstractWeatherCacheService } from './abstracts/weather-cache.service.abstract';
+
+@Injectable()
+export class WeatherService {
+  constructor(
+    private readonly weatherApiService: AbstractWeatherApiService,
+    private readonly metricService: AbstractWeatherMetricsService,
+    private readonly cache: AbstractWeatherCacheService
+  ) {}
+
+  async getWeather(city: string): Promise<WeatherResponseDto> {
+    const cachedData = await this.cache.weatherByCity.get(city);
+    if (cachedData) {
+      this.metricService.incFromCache();
+      return cachedData;
+    }
+    const weatherData = await this.weatherApiService.getWeather(city);
+    this.metricService.incFromApi();
+    await this.cache.weatherByCity.set(city, weatherData);
+    return weatherData;
+  }
+
+  async getDailyForecasts(cities: string[]): Promise<CitiesDailyForecastDto> {
+    const result: CitiesDailyForecastDto = {};
+
+    for (const city of cities) {
+      const cachedData = await this.cache.dailyForecastByCity.get(city);
+      if (cachedData) {
+        this.metricService.incFromCache();
+        result[city] = cachedData;
+        continue;
+      }
+      const forecastData = await this.weatherApiService
+        .getDailyForecast(city)
+        .catch((err) => {
+          if (err instanceof CityNotFoundException) {
+            return null;
+          }
+          throw err;
+        });
+      if (forecastData === null) {
+        continue;
+      }
+      this.metricService.incFromApi();
+      await this.cache.dailyForecastByCity.set(city, forecastData);
+      result[city] = forecastData;
+    }
+
+    return result;
+  }
+
+  async getHourlyForecasts(cities: string[]): Promise<CitiesHourlyForecastDto> {
+    const result: CitiesHourlyForecastDto = {};
+
+    for (const city of cities) {
+      const cachedData = await this.cache.hourlyForecastByCity.get(city);
+      if (cachedData) {
+        this.metricService.incFromCache();
+        result[city] = cachedData;
+        continue;
+      }
+      const forecastData = await this.weatherApiService
+        .getHourlyForecast(city)
+        .catch((err) => {
+          if (err instanceof CityNotFoundException) {
+            return null;
+          }
+          throw err;
+        });
+      if (forecastData === null) {
+        continue;
+      }
+      this.metricService.incFromApi();
+      await this.cache.hourlyForecastByCity.set(city, forecastData);
+      result[city] = forecastData;
+    }
+
+    return result;
+  }
+}

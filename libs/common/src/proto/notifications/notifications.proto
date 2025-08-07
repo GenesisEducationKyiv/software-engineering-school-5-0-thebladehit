@@ -1,0 +1,41 @@
+syntax="proto3";
+
+package notifications;
+
+service NotificationsService {
+  rpc SendConfirmation(ConfirmationRequest) returns (Empty);
+  rpc SendDailyForecast(DailyForecastRequest) returns (Empty);
+  rpc SendHourlyForecast(HourlyForecastRequest) returns (Empty);
+}
+
+message ConfirmationRequest {
+  string email = 1;
+  string token = 2;
+  string city = 3;
+  string frequency = 4;
+}
+
+message DailyForecastRequest {
+  string email = 1;
+  string city = 2;
+  float maxTemp = 3;
+  float minTemp = 4;
+  float avgTemp = 5;
+  float avgHumidity = 6;
+  float chanceOfRain = 7;
+  string description = 8;
+  string sunrise = 9;
+  string sunset = 10;
+}
+
+message HourlyForecastRequest {
+  string email = 1;
+  string city = 2;
+  float temp = 3;
+  string description = 4;
+  float feelsLikeTemp = 5;
+  float humidity = 6;
+  float chanceOfRain = 7;
+}
+
+message Empty {}

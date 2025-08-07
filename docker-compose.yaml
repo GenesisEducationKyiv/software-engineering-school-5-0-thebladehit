@@ -1,0 +1,117 @@
+version: '3.9'
+
+services:
+  weather:
+    build:
+      context: .
+      dockerfile: ./apps/weather/Dockerfile
+    restart: always
+    ports:
+      - "3001:3001"
+      - "3011:3011"
+    env_file:
+      - ./apps/weather/.env
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  notifications:
+    build:
+      context: .
+      dockerfile: ./apps/notifications/Dockerfile
+    restart: always
+    ports:
+      - "3002:3002"
+      - "3012:3012"
+    env_file:
+      - ./apps/notifications/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  subscriptions:
+    build:
+      context: .
+      dockerfile: ./apps/subscriptions/Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+      - "3010:3010"
+    env_file:
+      - ./apps/subscriptions/.env
+    command: ["sh", "-c", "npx prisma migrate deploy && npx prisma generate && node dist/apps/subscriptions/main.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      notifications:
+        condition: service_started
+      weather:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+    restart: always
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./apps/gateway/.env
+    depends_on:
+      subscriptions:
+        condition: service_started
+      weather:
+        condition: service_started
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1111
+      POSTGRES_DB: weather
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/data
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
